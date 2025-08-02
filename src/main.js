@@ -5,24 +5,20 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import {createBootstrap} from 'bootstrap-vue-next'
 
+// Add the necessary CSS
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
 
 import './assets/main.scss'
+import './color-modes'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-app.use(vuetify)
+app.use(createBootstrap()) 
 
 app.mount('#app')

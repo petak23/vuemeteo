@@ -14,8 +14,7 @@ export default {
 		const getUnits = () => {
 			MainService.getUnits()
 				.then(response => {
-					//console.log(response.data)
-					items.value = response.data.units
+					items.value = response.data
 				})
 				.catch((error) => {
 					console.log(error);
@@ -28,7 +27,7 @@ export default {
 </script>
 
 <template>
-	<v-table density="compact" theme="dark" v-if="items != null" class="table">
+	<table density="compact" theme="dark" v-if="items != null" class="table">
 		<tbody class="big">
 			<tr>
 				<th>Id</th>
@@ -49,7 +48,7 @@ export default {
 				<td>{{ unit }}</td>
 			</tr>
 		</tbody>
-	</v-table>
+	</table>
 </template>
 
 
@@ -66,8 +65,6 @@ export default {
 	}
 	.big {
 		display: none;
-
-		
 	}
 	@media (min-width: 720px) {
 		.small{

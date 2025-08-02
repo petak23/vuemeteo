@@ -1,14 +1,14 @@
 <script setup>
-import UserOverview from '../components/Homepage/UserOverview.vue';
+import UserInfo from '../components/UserInfo.vue';
 </script>
 
 <template>
   <div class="row">
 		<div class="col-12">
-			<h1>Homepage</h1>
+			<h1>Užívateľ</h1>
 		</div>
 		<div class="col-12">
-			<user-overview />
+			<user-info />
 		</div>
   </div>
 </template>

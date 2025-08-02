@@ -1,65 +1,36 @@
 <script setup>
-import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import AppFooter from './components/AppFooter.vue';
+import AppFooter from './components/AppFooter.vue'
+import MainMenu from './components/MainMenu/MainMenu.vue'
+import DarkModeButton from './components/DarkModeButton.vue'
+import MySettings from './components/MySettings.vue'
 
-const order = ref(-1)
+import { useMainStore } from './stores/main'
+const store = useMainStore()
 </script>
 
-<template>
-	<v-layout class="rounded rounded-md">
-		<v-navigation-drawer color="grey-darken-2" permanent>
-			<v-nav>
-				<v-list-item>
-					<template v-slot:prepend>
-						<i class="fa-solid fa-house-chimney"></i>
-					</template>
-					<template v-slot:default>
-						<RouterLink to="/">&nbsp;Home</RouterLink>
-					</template>
-				</v-list-item>
-				<v-list-item>
-					<template v-slot:prepend>
-						<i class="fa-solid fa-thermometer"></i>
-					</template>
-					<template v-slot:default>
-						<RouterLink to="/units">&nbsp;Jednotky</RouterLink>
-					</template>
-				</v-list-item>
-				<v-list-item>
-					<template v-slot:prepend>
-						<i class="fa-solid fa-arrow-right-to-bracket"></i>
-					</template>
-					<template v-slot:default>
-						<RouterLink to="/login">&nbsp;Prihlásenie</RouterLink>
-					</template>
-				</v-list-item>
-			</v-nav>
-		</v-navigation-drawer>
-
-		<v-app-bar
-			:order="order"
-			color="grey-lighten-2"
-			flat
-			title="VueMeteo - petak23"
-		>
-			<template v-slot:append>
-				<v-switch
-					v-model="order"
-					hide-details
-					inset
-					label="Toggle order"
-					true-value="-1"
-					false-value="0"
-				></v-switch>
-			</template>
-		</v-app-bar>
-
-		<v-main class="text-center">
-			<RouterView />
-		</v-main>
-		<app-footer />
-	</v-layout>
+<template>   
+	<div class="container-fluid">
+		<flash-message />
+		<my-settings />
+		<header class="row bg-primary-subtle p-0">
+			<RouterLink class="col-12 m-2 text-light-emphasis" to="/">
+				VueMeteo {{ (store.user == null ? '' : (' - ' + store.user.prefix)) }}
+			</RouterLink>
+		</header>
+		<main class="row">
+			<div class="col-12 col-sm-3 col-xl-2 overflow-y-auto bg-warning-subtle bg-opacity-25 pb-3">
+				<main-menu />
+			</div>
+			<div class="col-12 col-sm-9 col-xl-10 d-flex justify-content-between pb-2"> 
+				<RouterView />
+			</div>
+		</main>
+		<footer class="row bg-secondary-subtle">
+			<app-footer class="col-12 m-2"/>
+		</footer> 
+	</div>   
+	<dark-mode-button />
 </template>
 
 <style scoped>

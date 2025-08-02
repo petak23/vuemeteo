@@ -3,7 +3,10 @@ import axios from 'axios'
 //const baseUrl = document.getElementById('app').dataset.baseUrl + "/api/"
 //const baseUrl = "http://localhost/~petak23/vuemeteo/api/"
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-const baseUrl = "http://apimeteo.echo-msz.eu/"
+const baseUrl = "http://localhost/apimeteo/"
+//const baseUrl = "http://apimeteo.echo-msz.eu/"
+
+axios.defaults.withCredentials = true;
 
 const apiClient = axios.create({
 	baseURL: baseUrl,
@@ -31,13 +34,14 @@ export default {
 	getMyUserData() {
 		return apiClient.get('user')
 	},
-	/*getEvents(perPage, page) {
-		return apiClient.get('/events?_limit=' + perPage + '&_page=' + page)
-	},*/
-	/*postLogIn(event) {
-		return apiClient.post('/events', event)
-	},*/
+	postDeviceEdit(id_device, data) {
+		console.log(data)
+		return apiClient.post('device/' + id_device + '/edit', data)
+	},
 	postLogIn(data) {
 		return apiClient.post('/login', data)
+	},
+	getLogOut() {
+		return apiClient.get('/logout')
 	}
 }

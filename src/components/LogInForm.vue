@@ -1,18 +1,40 @@
 <script setup>
-import { ref } from 'vue'
+import { watch, ref, onMounted } from 'vue'
 import MainService from '../services/MainService';
 import { useMainStore } from '../stores/main'
+const store = useMainStore()
 
-const visible = ref(false)
+import { useFlashStore } from './FlashMessages/store/flash'
+const storeF = useFlashStore()
+
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const props = defineProps({
+	logOut: {
+		type: Boolean,
+		default: false,
+	}
+})
+
+//const visible = ref(false)
 const email = ref("")
 const password = ref("")
 const form = ref(false)
 const loading = ref(false)
 const visible_form = ref(true)
 
-const store = useMainStore()
-
-const rules = {
+const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+const state_email = ref(null)
+watch(() => email.value, () => {
+	state_email.value = pattern.test(email.value)
+})
+const state_password = ref(null)
+watch(() => password.value, () => {
+	state_password.value = password.value.length > 3
+})
+/*const rules = {
 	required: value => !!value || 'Pole musíte vyplniť!',
 	counter: value => value.length <= 20 || 'Max 20 characters',
 	count_password: value => value.length > 3 || 'Heslo muí mať viac ako 3 znaky.',
@@ -20,18 +42,26 @@ const rules = {
 		const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 		return pattern.test(value) || 'Chybný e-mail.'
 	}
-}
+}*/
 
 function submit_form() {
-	if (!form.value) return
+	console.log(email.value, password.value)
+	if (!email.value && !password.value) return
+	//if (!form.value) return
 	loading.value = true
 
-	MainService.postLogIn({ email: email, password: password })
+	MainService.postLogIn({ email: email.value, password: password.value })
 	.then(response => {
+		console.log(response.data);
 		store.token = response.data.token
 		store.user = response.data.user
 		visible_form.value = false
+		email.value = ""
+		password.value = ""
 		// Optionally, redirect to another page or update UI
+		loading.value = false
+		storeF.showMessage('Úspešne ste sa prihlásili.', 'success', 'Prihlásenie', 5000)
+		router.push('/') // Presmerovanie...
 	})
 	.catch(error => {
 		console.error('Login failed:', error);
@@ -39,90 +69,67 @@ function submit_form() {
 
 	setTimeout(() => (loading.value = false), 2000)
 }
+
+onMounted(() => {
+	if (props.logOut) {
+		MainService.getLogOut()
+		.then(response => {
+			console.log(response.data);
+			store.token = null
+			store.user = null
+			// Optionally, redirect to another page or update UI
+			storeF.showMessage('Boli ste odhlásený.', 'secondary', 'Odhlásenie', 5000)
+		})
+		.catch(error => {
+			console.error('Logout failed:', error);
+		});
+	}
+})
 </script>
 
 <template>
 	<div>
-		<!--v-img
-			class="mx-auto my-6"
-			max-width="228"
-			src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"
-		></v-img-->
-	<v-form
-		v-model="form"
-		@submit.prevent="submit_form"
-		v-if="visible_form"
-	>
-		<v-card
-			class="mx-auto pa-12 pb-8"
-			elevation="8"
-			max-width="448"
-			rounded="lg"
+		<BForm
+			v-model="form"
+			@submit.prevent="submit_form"
+			v-if="visible_form"
 		>
-			<div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-				Email
-			</div>
-
-			<v-text-field
-				v-model="email"
-				density="compact"
-				placeholder="Zadaj svoj email"
-				prepend-inner-icon="mdi-email-outline"
-				variant="outlined"
-				type="email"
-				:rules="[rules.required, rules.email]"
-			></v-text-field>
-
-			<div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-				Heslo
-
-				<a
-					class="text-caption text-decoration-none text-blue"
-					href="forgotten_password"
-					rel="noopener noreferrer"
-					target="_blank"
-				>
-					Zabudnuté heslo?</a>
-			</div>
-
-			<v-text-field
-				v-model="password"
-				:append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-				:type="visible ? 'text' : 'password'"
-				density="compact"
-				placeholder="Zadaj svoje heslo"
-				prepend-inner-icon="mdi-lock-outline"
-				variant="outlined"
-				@click:append-inner="visible = !visible"
-				:rules="[rules.required, rules.count_password]"
-			></v-text-field>
-
-			<v-btn
-				block
-				class="mb-8"
-				color="success"
-				size="large"
-				variant="elevated"
-				:disabled="!form"
-				:loading="loading"
+			<BFormFloatingLabel
+				label="Email address"
+				label-for="floatingEmail"
+				class="my-2"
+			>
+				<BFormInput
+					id="floatingEmail"
+					type="email"
+					placeholder="Email address"
+					v-model="email"
+					:state="state_email"
+					required
+				/>
+			</BFormFloatingLabel>
+			<BFormFloatingLabel
+				label="Password"
+				label-for="floatingPassword"
+				class="my-2"
+			>
+				<BFormInput
+					id="floatingPassword"
+					type="password"
+					placeholder="Password"
+					v-model="password"
+					required
+				/>
+			</BFormFloatingLabel>
+			<BButton
 				type="submit"
+				variant="outline-success"
+				:disabled="!(state_email && state_password)"
+				loading-text="Prihlasujem..."
+				:loading="loading"
 			>
-				Prihlás sa...
-			</v-btn>
-
-			<!--
-			<v-card
-				class="mb-12"
-				color="surface-variant"
-				variant="tonal"
-			>
-				<v-card-text class="text-medium-emphasis text-caption">
-					Warning: After 3 consecutive failed login attempts, you account will be temporarily locked for three hours. If you must login now, you can also click "Forgot login password?" below to reset the login password.
-				</v-card-text>
-			</v-card>
-			-->
-			
-		</v-card>
-	</v-form>
+				Prihlás sa
+			</BButton>
+		</BForm>
 	</div>
 </template>

@@ -11,14 +11,6 @@ const router = createRouter({
 			component: HomeView
 		},
 		{
-			path: '/about',
-			name: 'about',
-			// route level code-splitting
-			// this generates a separate chunk (About.[hash].js) for this route
-			// which is lazy-loaded when the route is visited.
-			component: () => import('../views/AboutView.vue')
-		},
-		{
 			path: '/units',
 			name: 'units',
 			// route level code-splitting
@@ -33,7 +25,35 @@ const router = createRouter({
 			// this generates a separate chunk (About.[hash].js) for this route
 			// which is lazy-loaded when the route is visited.
 			component: () => import('../views/LogInView.vue')
-		}
+		},
+		{
+			path: '/logout',
+			name: 'LogOut',
+			component: () => import('../views/LogInView.vue'),
+			props: { logOut: true }
+		},
+		{
+			path: '/user',
+			name: 'Užívateľ',
+			component: () => import('../views/UserView.vue')
+		},
+		{
+			path: '/devices',
+			name: 'Zariadenia',
+			component: () => import('../views/DevicesView.vue')
+		},
+		{
+			path: '/device/:id',
+			name: 'Zariadenie',
+			props: true,
+			component: () => import('../views/DeviceView.vue')
+		},
+		{
+			path: '/device/edit/:id',
+			name: 'Zariadenie - editácia',
+			component: () => import('../views/DeviceView.vue'),
+			props: { edit: true }
+		},
 	]
 })
 
