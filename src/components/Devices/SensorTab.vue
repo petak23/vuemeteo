@@ -26,7 +26,7 @@ const props = defineProps({
 				:class="index % 2 ? 'bg-light-subtle' : 'bg-dark-subtle'"
 			>
 				<div class="col-6 col-md-2">
-					<a :href="'sensor/show/' + sensor.id" ><!-- TODO link -->
+					<a aria-disabled="true" class="btn btn-link btn-sm disabled" :href="'sensor/show/' + sensor.id" ><!-- TODO link -->
 						<small>({{ k }})</small><b>{{sensor.name}}</b>
 					</a>
 					<Device_popover v-if="sensor.warningIcon > 0"
@@ -73,20 +73,22 @@ const props = defineProps({
 					<i>{{ sensor.desc }}</i>
 				</div>
 				<div class="col-6 col-md-2"><!-- TODO links -->
-					<a href="../chart/sensorstat/show/{$sensor['id']}/?current=1"
-						class="text-warning-emphasis pe-2"
+					<a aria-disabled="true" class="btn btn-link btn-sm disabled text-warning-emphasis pe-2" 
+					  :href="'../chart/sensorstat/show/' + sensor.id + '/?current=1'"
 						title="Štatistika"
 					>
 						<i class="fa-solid fa-chart-simple"></i>
 					</a>
-					<a href="../chart/sensor/show/{$sensor['id']}/?current=1"
-						class="text-warning-emphasis pe-2"
+					<a 
+						aria-disabled="true" class="btn btn-link btn-sm disabled text-warning-emphasis pe-2"
+						:href="'../chart/sensor/show/' + sensor.id + '/?current=1'"
 						title="Graf"
 					>
 						<i class="fa-solid fa-chart-line"></i>
 					</a> 
-					<a href="'sensor/edit/' + sensor.id" 
-						class="text-warning-emphasis" title="Edit">
+					<a 
+						aria-disabled="true" class="btn btn-link btn-sm disabled text-warning-emphasis"
+						:href="'sensor/edit/' + sensor.id" title="Edit">
 						<i class="fa-solid fa-pencil"></i>
 					</a>
 				</div>

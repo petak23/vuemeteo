@@ -51,8 +51,8 @@ const store = useMainStore()
 	<div class="row px-2  pt-3">
 		<div class="col-12">
 			<!-- TODO links-->
-			<a :href="'Inventory:edit'" class="btn btn-outline-primary btn-sm" role="button">Zmeniť nastavenie</a>
-			<a :href="'Inventory:password'" class="btn btn-outline-primary btn-sm" role="button">Zmeniť heslo</a>
+			<a aria-disabled="true" :href="'Inventory:edit'" class="btn btn-outline-primary btn-sm disabled" role="button">Zmeniť nastavenie</a>
+			<a aria-disabled="true" :href="'Inventory:password'" class="btn btn-outline-primary btn-sm disabled" role="button">Zmeniť heslo</a>
 		</div>
 	</div>
 
@@ -104,7 +104,7 @@ const store = useMainStore()
 		<div class="col-12">
 			<RouterLink to="/devices" class="btn btn-outline-primary btn-sm" role="button">Zariadenia</RouterLink>
 			<!-- TODO link-->
-			<a :href="'View:views'" class="btn btn-outline-primary btn-sm" role="button">Grafy</a>
+			<a aria-disabled="true" :href="'View:views'" class="btn btn-outline-primary btn-sm disabled" role="button">Grafy</a>
 		</div>
 	</div>
 </div>

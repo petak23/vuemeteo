@@ -44,7 +44,7 @@ const  getDevice = async (id) => {
 
 watch(() => props.id, () => {
 	if (props.id > 0) getDevice(props.id)
-	else setError("Chybné id: [" + props.id + "] zariadenia.(1)")
+	//else setError("Chybné id: [" + props.id + "] zariadenia.(1)")
 })
 
 watch(() => route.params.id, (newId) => {
