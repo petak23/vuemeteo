@@ -29,7 +29,7 @@ onMounted(()=> {
 
 <template v-if="items != null">
 	<div v-for="item in items" :key="item.id" class="col">
-		<div class="card h-100 text-bg-dark border-warning">
+		<div class="card h-100 bg-light-subtle border-warning">
 			<h5 class="card-header">
 				{{ item.name }}
 			</h5>
@@ -54,7 +54,7 @@ onMounted(()=> {
 			</div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-end pt-2">
-					<RouterLink :to="'device/' + item.id" class="btn btn-outline-info">
+					<RouterLink :to="'device/' + item.id" class="btn btn-outline-secondary">
 						Viac info <i class="fa-solid fa-angles-right"></i>
 					</RouterLink>
 				</div>

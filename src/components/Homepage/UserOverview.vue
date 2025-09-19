@@ -7,7 +7,7 @@ import { RouterLink } from 'vue-router'
 
 <template>
 	<div class="col" v-if="store.user != null">
-		<div class="card h-100 bg-dark-subtle border-warning">
+		<div class="card h-100 bg-light-subtle border-warning">
 			<h5 class="card-header">
 				{{ store.user.email }}
 			</h5>
@@ -26,7 +26,7 @@ import { RouterLink } from 'vue-router'
 			</div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-end pt-2">
-					<RouterLink to="/user" class="btn btn-outline-info">
+					<RouterLink to="/user" class="btn btn-outline-secondary">
 						Viac info <i class="fa-solid fa-angles-right"></i>
 					</RouterLink>
 				</div>
