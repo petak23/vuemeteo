@@ -33,7 +33,7 @@ const  getDevice = async (id) => {
 			}
 			else {
 				setError(response.data.message)
-				console.log(response.data)
+				device_one.value = null
 			}
 		})
 		.catch((error) => {
@@ -61,12 +61,28 @@ onMounted(()=> {
 
 <template>
 	<div class="row">
-		<device v-if="device_one != null && !props.edit" :device_item="device_one" />
-		<div class="col-12" v-else-if="device_one != null && props.edit">
-			<h2>Editácia zariadenia: {{ device_one.name }}</h2>
-			<device-edit 
-				:default-values="device_one"
-			/>
+		<div class="col-12" v-if="device_one != null">
+			<h1
+				class="d-flex justify-content-between"
+			>
+				{{ props.edit ? 'Editácia' : 'Info' }} zariadenia: {{ device_one.name }}
+				<div class="btn-group" role="group" >
+					<RouterLink :to="'edit/'+device_one.id" v-if="!props.edit" 
+						class="btn btn-outline-secondary border-0 rounded-0" title="Upraviť zariadenie" role="button">
+						<i class="fa-solid fa-pen-to-square fa-xl"></i>
+					</RouterLink>
+					<RouterLink :to="'/device/'+device_one.id" v-else
+						class="btn btn-outline-primary border-0 rounded-0" title="Späť na zariadenie" role="button">
+						<i class="ms-2 fa-solid fa-rotate-left"></i>
+					</RouterLink>
+				</div>
+			</h1>
+
+		</div>
+		<hr />
+		<div class="col-12" v-if="error_message == '' && device_one != null">
+			<device v-if="!props.edit" :device_item="device_one" />
+			<device-edit v-else :default-values="device_one" />
 		</div>
 		<div v-else-if="error_message != ''" class="row px-2 py-3">
 			<div class="col-12 alert alert-danger" role="alert">{{ error_message }}</div>
@@ -76,9 +92,13 @@ onMounted(()=> {
 				<span class="visually-hidden">Loading...</span>
 			</div>
 		</div>
-		<div class="col-12 border-top mt-1 pt-2">
-			<RouterLink to="/devices" class="btn btn-outline-primary btn-sm">
+		<div v-if="device_one != null" class="col-12 border-top mt-1 pt-2">
+			<RouterLink to="/devices" class="btn btn-outline-secondary btn-sm" v-if="!props.edit">
 				Späť na zoznam zariadení <i class="ms-2 fa-solid fa-rotate-left"></i>
+			</RouterLink>
+			<RouterLink :to="'/device/'+device_one.id" v-else
+				class="btn btn-outline-secondary btn-sm" title="Späť na zariadenie" role="button">
+				Späť na zariadenie <i class="ms-2 fa-solid fa-rotate-left"></i>
 			</RouterLink>
 		</div>
 	</div>

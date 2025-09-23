@@ -13,10 +13,16 @@ const store = useMainStore()
 	<div class="container-fluid">
 		<flash-message />
 		<my-settings />
-		<header class="row bg-primary-subtle p-0 border-bottom border-primary-subtle">
-			<RouterLink class="col-12 m-2 text-light-emphasis" to="/">
-				VueMeteo {{ (store.user == null ? '' : (' - ' + store.user.prefix)) }}
+		<header class="row bg-primary-subtle p-0 border-bottom border-primary-subtle d-sm-flex justify-content-sm-between">
+			<RouterLink class="col-12 col-sm m-2 text-light-emphasis" to="/">
+				VueMeteo
 			</RouterLink>
+			<div class="col-12 col-sm text-sm-end mt-sm-2 me-3">
+				<span class="text-secondary-emphasis me-2">
+					<i class="fa-solid fa-user"></i>
+					{{ store.user != null ? store.user.prefix : '---' }}
+				</span>
+			</div>
 		</header>
 		<main class="row">
 			<div class="col-12 col-sm-4 col-md-3 col-lg-2 overflow-y-auto bg-dark-subtle pb-3 border-end border-dark-subtle">

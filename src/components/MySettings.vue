@@ -5,8 +5,8 @@ import MainService from '../services/MainService'
 import { useMainStore } from '../stores/main'
 const store = useMainStore()
 
-const getMySettings = () => {
-	MainService.getMySettings()
+const getMySettings = async () => {
+	await MainService.getMySettings()
 		.then(response => {
 			//console.log(response.data)
 			store.appName = response.data.appName
@@ -19,14 +19,10 @@ const getMySettings = () => {
 		})
 }
 
-const getActualUser = () => {
-	MainService.getMyUserData()
+const getActualUser = async () => {
+	await MainService.getMyUserData()
 		.then(response => {
-			if (response.data.status != 200) {
-				store.user = null
-				return
-			}
-			store.user = response.data
+			store.user = (response.data.status == 200) ? response.data.data : null
 		})
 		.catch((error) => {
 			console.error(error)

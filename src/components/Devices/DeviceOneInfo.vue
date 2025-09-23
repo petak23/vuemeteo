@@ -33,17 +33,6 @@ const rssiComputed = computed(() => {
 
 <template>
 	<div class="col-12">
-		<h1 class="d-flex justify-content-between">
-			Zariadenie ({{ item.id }}) - {{ item.name }}
-			<div class="btn-group" role="group">
-				<RouterLink :to="'edit/'+item.id" 
-					class="btn btn-outline-secondary border-0 rounded-0" title="Upraviť zariadenie" role="button">
-					<i class="fa-solid fa-pen-to-square fa-xl"></i>
-				</RouterLink>
-			</div>
-		</h1>
-	</div>
-	<div class="col-12">
 		<h3>Konfigurácia zariadenia</h3>
 		<i>Po stisku tlačítka sa zobrazí konfigurácia, 
 			ktorú je potrebné nastaviť do zariadenia v konfiguračnom portály zariadenia.</i>
