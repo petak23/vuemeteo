@@ -168,7 +168,7 @@ const rssiComputed = computed(() => {
 	<BModal
 		v-model="viewConfigModal"
 		title="Zmena konfigurácie"
-		v-b-modal.modal-center
+		centered
 		class="modal-xl"
 	>
 		href="Device:sendconfig {{ item.id }}"

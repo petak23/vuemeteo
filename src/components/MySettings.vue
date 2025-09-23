@@ -22,6 +22,10 @@ const getMySettings = () => {
 const getActualUser = () => {
 	MainService.getMyUserData()
 		.then(response => {
+			if (response.data.status != 200) {
+				store.user = null
+				return
+			}
 			store.user = response.data
 		})
 		.catch((error) => {
@@ -34,3 +38,5 @@ onMounted(() => {
 	getActualUser()
 })
 </script>
+
+<template></template>

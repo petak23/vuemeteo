@@ -45,7 +45,7 @@ const router = createRouter({
 		{
 			path: '/device/:id',
 			name: 'Zariadenie',
-			props: true,
+			props: route => ({ id: Number(route.params.id) }),
 			component: () => import('../views/DeviceView.vue')
 		},
 		{

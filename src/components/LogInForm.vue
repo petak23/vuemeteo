@@ -52,7 +52,7 @@ function submit_form() {
 
 	MainService.postLogIn({ email: email.value, password: password.value })
 	.then(response => {
-		console.log(response.data);
+		//console.log(response.data);
 		store.token = response.data.token
 		store.user = response.data.user
 		visible_form.value = false

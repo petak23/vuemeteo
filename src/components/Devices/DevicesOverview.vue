@@ -11,11 +11,19 @@ const format_date = (value) => {
 	return date.format('D.M.YYYY HH:mm:ss');
 }
 
+const emit = defineEmits(['error'])
+
 const getDevices = () => {
 	MainService.getDevices()
 		.then(response => {
-			console.log(response.data)
-			items.value = response.data
+			if (response.data.status == 200) {
+				items.value = response.data.data
+			}
+			else {
+				items.value = null
+				emit('error', response.data)
+				console.error(response.data.message)
+			}
 		})
 		.catch((error) => {
 			console.log(error);
