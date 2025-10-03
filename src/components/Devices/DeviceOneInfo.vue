@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue'
 import SensorTab from './SensorTab.vue'
+import DeviceSendConfig from './DeviceSendConfig.vue'
 
 const props = defineProps({
 	device_item: { 
@@ -61,9 +62,7 @@ const rssiComputed = computed(() => {
 		</BAccordion>
 	</div>
 	
-	<div class="col-12">
-		<h3>Informácie</h3>
-	</div>
+	<div class="col-12"><h3>Informácie</h3></div>
 	<div class="col-12 col-md-2 bg-secondary-subtle">Popis:</div>
 	<div class="col-12 col-md-10 bg-secondary-subtle">{{ item.desc }}</div>
 
@@ -156,12 +155,11 @@ const rssiComputed = computed(() => {
 	</div>
 	<BModal
 		v-model="viewConfigModal"
-		title="Zmena konfigurácie"
+		:title="'Poslať zmenu konfigurácie pre zariadenie ' + item.name"
 		centered
 		class="modal-xl"
 	>
-		href="Device:sendconfig {{ item.id }}"
-		Tu bude zmena konfigurácie...
+		<device-send-config :item="item" />
 	</BModal>
 
 	<sensor-tab 

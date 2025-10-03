@@ -1,5 +1,7 @@
 <script setup>
+import { RouterLink } from 'vue-router';
 import Device_popover from './Device_popover.vue'
+
 const props = defineProps({
 	sensors: {
 		type: Object,
@@ -26,9 +28,9 @@ const props = defineProps({
 				:class="index % 2 ? 'bg-light-subtle' : 'bg-dark-subtle'"
 			>
 				<div class="col-6 col-md-2">
-					<a aria-disabled="true" class="btn btn-link btn-sm disabled" :href="'sensor/show/' + sensor.id" ><!-- TODO link -->
+					<RouterLink class="btn btn-link btn-sm" :to="'/sensor/' + sensor.id" >
 						<small>({{ k }})</small><b>{{sensor.name}}</b>
-					</a>
+					</RouterLink>
 					<Device_popover v-if="sensor.warningIcon > 0"
 						:fa_icon="'exclamation-triangle ' + sensor.warningIcon == 1 ? 'text-danger' : 'text-warning'"
 						:text="'Senzor nedodáva data. Posledné data: ' + format_date(sensor.last_data_time) + '.'"

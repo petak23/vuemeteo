@@ -80,7 +80,7 @@ onMounted(()=> {
 
 		</div>
 		<hr />
-		<div class="col-12" v-if="error_message == '' && device_one != null">
+		<div class="col-12 row" v-if="error_message == '' && device_one != null">
 			<device v-if="!props.edit" :device_item="device_one" />
 			<device-edit v-else :default-values="device_one" />
 		</div>

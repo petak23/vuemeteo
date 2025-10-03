@@ -2,8 +2,8 @@ import axios from 'axios'
 
 //const baseUrl = document.getElementById('app').dataset.baseUrl + "/api/"
 //const baseUrl = "http://localhost/~petak23/vuemeteo/api/"
-const baseUrl = "http://localhost/~petak23/apimeteo/"
-//const baseUrl = "http://localhost/apimeteo/"
+//const baseUrl = "http://localhost/~petak23/apimeteo/"
+const baseUrl = "http://localhost/apimeteo/"
 //const baseUrl = "http://apimeteo.echo-msz.eu/"
 
 axios.defaults.withCredentials = true;
@@ -27,6 +27,9 @@ export default {
 	},
 	getDevice(id_device) {
 		return apiClient.get('device/' + id_device)
+	},
+	getSensor(id) {	
+		return apiClient.get('sensor/' + id)
 	},
 	getUnits() {
 		return apiClient.get('units')

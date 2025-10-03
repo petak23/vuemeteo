@@ -14,7 +14,8 @@ export default {
 		const getUnits = () => {
 			MainService.getUnits()
 				.then(response => {
-					items.value = response.data
+					if (response.data.status == 200)
+						items.value = response.data.data
 				})
 				.catch((error) => {
 					console.log(error);

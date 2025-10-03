@@ -45,7 +45,6 @@ watch(() => password.value, () => {
 }*/
 
 function submit_form() {
-	console.log(email.value, password.value)
 	if (!email.value && !password.value) return
 	//if (!form.value) return
 	loading.value = true

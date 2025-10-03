@@ -71,7 +71,7 @@ const getDevices = () => {
 			</div>
 		</div>
 		
-		<SensorTab 
+		<sensor-tab
 			:sensors="item.sensors"
 		/>
 	</div>

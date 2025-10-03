@@ -54,6 +54,12 @@ const router = createRouter({
 			component: () => import('../views/DeviceView.vue'),
 			props: { edit: true }
 		},
+		{
+			path: '/sensor/:id',
+			name: 'Senzor',
+			props: route => ({ id: Number(route.params.id) }),
+			component: () => import('../views/SensorView.vue')
+		},
 	]
 })
 
