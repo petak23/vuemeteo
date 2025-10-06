@@ -17,8 +17,11 @@ const error = ref(null)
 				@error="error = $event"
 			/>			
 		</div>
-		<div v-if="error != null" class="col-12 alert alert-danger ms-2 mt-2" role="alert">
-			<h4 class="alert-heading">Chyba: {{ error.status }}</h4>
+		<div class="col-12 mb-4 border-bottom">
+			<p>Meteorologická búdka - PV</p>
+		</div>
+		<div v-if="error != null" class="col-12 alert alert-warning ms-2 mt-2" role="alert">
+			<h5 class="alert-heading">Chyba: {{ error.status }}</h5>
 			<p>{{ error.message }}</p>
 		</div>
   </div>

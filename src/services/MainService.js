@@ -4,7 +4,10 @@ import axios from 'axios'
 //const baseUrl = "http://localhost/~petak23/vuemeteo/api/"
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
 //const baseUrl = "http://localhost/apimeteo/"
-const baseUrl = "http://apimeteo.echo-msz.eu/"
+//const baseUrl = "http://apimeteo.echo-msz.eu/"
+
+console.log(window.location.origin)
+const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "http://apimeteo.echo-msz.eu/" 
 
 axios.defaults.withCredentials = true;
 

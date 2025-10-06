@@ -53,7 +53,7 @@ function submit_form() {
 	.then(response => {
 		//console.log(response.data);
 		store.token = response.data.token
-		store.user = response.data.user
+		store.user = response.data.user.data
 		visible_form.value = false
 		email.value = ""
 		password.value = ""
