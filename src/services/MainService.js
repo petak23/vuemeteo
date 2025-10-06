@@ -3,8 +3,8 @@ import axios from 'axios'
 //const baseUrl = document.getElementById('app').dataset.baseUrl + "/api/"
 //const baseUrl = "http://localhost/~petak23/vuemeteo/api/"
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-const baseUrl = "http://localhost/apimeteo/"
-//const baseUrl = "http://apimeteo.echo-msz.eu/"
+//const baseUrl = "http://localhost/apimeteo/"
+const baseUrl = "http://apimeteo.echo-msz.eu/"
 
 axios.defaults.withCredentials = true;
 
