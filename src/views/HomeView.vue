@@ -17,7 +17,7 @@ const error = ref(null)
 				@error="error = $event"
 			/>			
 		</div>
-		<div class="col-12 mb-4 border-bottom">
+		<div v-if="error != null" class="col-12 mb-4 border-bottom">
 			<p>Meteorologická búdka - PV</p>
 		</div>
 		<div v-if="error != null" class="col-12 alert alert-warning ms-2 mt-2" role="alert">

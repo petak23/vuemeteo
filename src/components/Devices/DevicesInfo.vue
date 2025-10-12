@@ -5,7 +5,8 @@ import dayjs from 'dayjs'; //https://day.js.org/docs/en/display/format
 import Device_popover from './Device_popover.vue';
 import SensorTab from './SensorTab.vue';
 
-const items = ref(null)
+import { useMainStore } from '../../stores/main'
+const store = useMainStore()
 
 onMounted(()=> {
 	getDevices();
@@ -25,10 +26,11 @@ const getDevices = () => {
 	MainService.getDevices()
 		.then(response => {
 			if (response.data.status == 200) {
-				items.value = response.data.data
+				store.devices = response.data.data
+				store.addDevicesToMenu()
 			}
 			else {
-				items.value = null
+				store.devices = null
 				emit('error', response.data)
 				console.error(response.data.message)
 			}
@@ -39,8 +41,8 @@ const getDevices = () => {
 }
 </script>
 
-<template v-if="items != null">
-	<div v-for="item in items" :key="item.id" class="device">
+<template v-if="store.devices != null">
+	<div v-for="item in store.devices" :key="item.id" class="device">
 		<div class="row px-2 bg-secondary-subtle device-head" >
 			<div class="col-4 col-md-3">Zariadenie</div>
 			<div class="col-12 col-md-4">Popis</div>

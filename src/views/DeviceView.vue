@@ -5,8 +5,10 @@ import MainService from '../services/MainService'
 import Device from '../components/Devices/DeviceOneInfo.vue'
 import DeviceEdit from '../components/Devices/Device_edit.vue'
 import { useRoute } from 'vue-router'
-
 const route = useRoute()
+
+import { useMainStore } from '../stores/main'
+const store = useMainStore()
 
 const props = defineProps({
 	id: { type: Number, default: 0 },
@@ -26,14 +28,16 @@ const  getDevice = async (id) => {
 	await MainService.getDevice(id)
 		.then(response => {
 			if (response.data.status == 200) {
-				console.log(response.data)
+				//console.log(response.data)
 				device_one.value = response.data.data
-				console.log(device_one.value);
-				
+				//console.log(device_one.value);
+				store.actual_device_id = device_one.value.id
+				store.actual_sensor_id = null
 			}
 			else {
 				setError(response.data.message)
 				device_one.value = null
+				store.resetActualDeviceId()
 			}
 		})
 		.catch((error) => {

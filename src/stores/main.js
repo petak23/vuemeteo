@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useMainStore = defineStore('main', () => {
@@ -19,38 +19,61 @@ export const useMainStore = defineStore('main', () => {
 	const token = ref(null)
 
 	const main_menu = ref([
-		/*{
-			view_in_main_menu: true,
-			path: '/',
+		{
+			only_logged_in: false,
+			to: '/',
 			name: 'Domov',
-			component: HomePageView
+			fa_icon: 'fa-house-chimney',
+			children: null
 		},
 		{
-			view_in_main_menu: true,
-			path: '/user',
-			name: 'Môj účet',
-			component: UserView
-		},
-		{
-			view_in_main_menu: true,
-			path: '/devices',
-			name: 'Zariadenia',
-			component: DevicesView
-		},
-		{
-			view_in_main_menu: false,
-			path: '/device/:id',
-			name: 'Zariadenie',
-			props: true,
-			component: DeviceView
-		},
-		{
-			view_in_main_menu: true,
-			path: '/units',
+			only_logged_in: false,
+			to: '/units',
 			name: 'Jednotky',
-			component: UnitsView
-		}*/
+			fa_icon: 'fa-thermometer',
+			children: null
+		},
+		{
+			only_logged_in: true, // len prihlásený užívateľ
+			to: '/user',
+			name: 'Užívateľ',
+			fa_icon: 'fa-user',
+			children: null
+		},
+		{
+			only_logged_in: true, // len prihlásený užívateľ
+			to: '/devices',
+			name: 'Zariadenia',
+			fa_icon: 'fa-walkie-talkie',
+			children: null
+		},
 	])
 
-	return { baseUrl, apiPath, appName, links, dataRetentionDays, minYear, user, token, main_menu }
+	const devices = ref(null) // Pole zariadení
+	const actual_device_id = ref(null) // ID práve zobrazeného zariadenia
+	const actual_sensor_id = ref(null) // ID práve zobrazeného senzora
+
+	const addDevicesToMenu = () => {
+		main_menu.value[3].children = devices.value
+	}
+
+	const setActualDeviceId = (id, ids = null) => {
+		actual_device_id.value = id
+		actual_sensor_id.value = ids
+	}
+
+	const resetActualDeviceId = () => {
+		actual_device_id.value = null
+		actual_sensor_id.value = null
+	}
+
+	watch(() => devices, () => {
+		main_menu.value[3].children = devices.value
+	})
+
+	return { 
+		baseUrl, apiPath, appName, links, dataRetentionDays, minYear, user, token, 
+		main_menu, 
+		devices, addDevicesToMenu, setActualDeviceId, resetActualDeviceId, actual_device_id, actual_sensor_id
+	}
 })
