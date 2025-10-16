@@ -38,6 +38,18 @@ const router = createRouter({
 			component: () => import('../views/UserView.vue')
 		},
 		{
+			path: '/user/edit/:id',
+			name: 'Užívateľ - editácia',
+			component: () => import('../views/UserView.vue'),
+			props: { edit: 1 }
+		},
+		{
+			path: '/user/pswchange/:id',
+			name: 'Užívateľ - zmena hesla',
+			component: () => import('../views/UserView.vue'),
+			props: { edit: 2 }
+		},
+		{
 			path: '/devices',
 			name: 'Zariadenia',
 			component: () => import('../views/DevicesView.vue')

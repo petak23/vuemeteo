@@ -37,17 +37,23 @@ export default {
 	getUnits() {
 		return apiClient.get('units')
 	},
-	getMyUserData() {
-		return apiClient.get('user')
-	},
+	
 	postDeviceEdit(id_device, data) {
 		console.log(data)
 		return apiClient.post('device/' + id_device + '/edit', data)
 	},
+
+	// User
 	postLogIn(data) {
 		return apiClient.post('/login', data)
 	},
 	getLogOut() {
 		return apiClient.get('/logout')
+	},
+	getMyUserData() {
+		return apiClient.get('user')
+	},
+	postSaveUser(id_user, data) {
+		return apiClient.post('user/save/' + id_user, data)
 	}
 }
