@@ -48,7 +48,7 @@ const onReset = () => {
 	if (store.user) {
 		email.value = store.user.email || '';
 		monitoring_token.value = store.user.monitoring_token || '';
-		router.push('/user')
+		router.push('/user/user')
 	}
 }
 </script>

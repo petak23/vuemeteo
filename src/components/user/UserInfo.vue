@@ -52,7 +52,7 @@ const store = useMainStore()
 	<div class="row px-2  pt-3">
 		<div class="col-12">
 			<RouterLink :to="'/user/edit/'+store.user.id" class="btn btn-outline-primary btn-sm" role="button">Zmeniť nastavenie</RouterLink>
-			<RouterLink :to="'/user/pswchange/'+store.user.id" class="btn btn-outline-primary btn-sm" role="button">Zmeniť heslo</RouterLink>
+			<RouterLink :to="'/user/passwordchange/'+store.user.id" class="btn btn-outline-primary btn-sm" role="button">Zmeniť heslo</RouterLink>
 		</div>
 	</div>
 

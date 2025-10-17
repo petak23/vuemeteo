@@ -2,12 +2,12 @@ import axios from 'axios'
 
 //const baseUrl = document.getElementById('app').dataset.baseUrl + "/api/"
 //const baseUrl = "http://localhost/~petak23/vuemeteo/api/"
-//const baseUrl = "http://localhost/~petak23/apimeteo/"
+const baseUrl = "http://localhost/~petak23/apimeteo/"
 //const baseUrl = "http://localhost/apimeteo/"
 //const baseUrl = "http://apimeteo.echo-msz.eu/"
 
-console.log(window.location.origin)
-const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "http://apimeteo.echo-msz.eu/" 
+//console.log(window.location.origin)
+//const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "http://apimeteo.echo-msz.eu/" 
 
 axios.defaults.withCredentials = true;
 
@@ -51,9 +51,12 @@ export default {
 		return apiClient.get('/logout')
 	},
 	getMyUserData() {
-		return apiClient.get('user')
+		return apiClient.get('user/user')
 	},
 	postSaveUser(id_user, data) {
 		return apiClient.post('user/save/' + id_user, data)
+	},
+	postChangePassword(id_user, data) {
+		return apiClient.post('user/passwordchange/' + id_user, data)
 	}
 }

@@ -35,7 +35,7 @@ export const useMainStore = defineStore('main', () => {
 		},
 		{
 			only_logged_in: true, // len prihlásený užívateľ
-			to: '/user',
+			to: '/user/user',
 			name: 'Užívateľ',
 			fa_icon: 'fa-user',
 			children: null

@@ -33,7 +33,7 @@ const router = createRouter({
 			props: { logOut: true }
 		},
 		{
-			path: '/user',
+			path: '/user/user',
 			name: 'Užívateľ',
 			component: () => import('../views/UserView.vue')
 		},
@@ -44,7 +44,7 @@ const router = createRouter({
 			props: { edit: 1 }
 		},
 		{
-			path: '/user/pswchange/:id',
+			path: '/user/passwordchange/:id',
 			name: 'Užívateľ - zmena hesla',
 			component: () => import('../views/UserView.vue'),
 			props: { edit: 2 }

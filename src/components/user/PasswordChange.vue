@@ -1,6 +1,15 @@
 <script setup>
 import { ref, computed } from 'vue'
-//import { BCard, BForm, BFormGroup, BFormInput, BButton, BFormInvalidFeedback } from 'bootstrap-vue-next'
+import MainService from '../../services/MainService'
+
+import { useMainStore } from '../../stores/main'
+const store = useMainStore()
+
+import { useFlashStore } from '../../components/FlashMessages/store/flash'
+const storeF = useFlashStore()
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const form = ref({
 	oldPassword: '',
@@ -33,7 +42,10 @@ const formValid = computed(() =>
 )
 
 const onSubmit = async () => {
-	await MainService.postSaveUser(store.user.id, { email: email.value, monitoring_token: monitoring_token.value })
+	await MainService.postChangePassword(store.user.id, {
+		oldPassword: form.value.oldPassword,
+		newPassword: form.value.newPassword
+	})
 		.then(response => {
 			if (response.data.status == 200) {
 				store.user = response.data.data
@@ -43,18 +55,25 @@ const onSubmit = async () => {
 		})
 		.catch((error) => {
 			console.log(error)
-			storeF.showMessage('Chyba pri zmene údajov. ' + error, 'danger', 'Error', 5000)
+			storeF.showMessage('Chyba pri zmene údajov: ' + error, 'danger', 'Error', 5000)
 		})
 	alert('Heslo úspešne zmenené!')
 	form.value.oldPassword = ''
 	form.value.newPassword = ''
 	form.value.confirmPassword = ''
 }
+
+const onReset = () => {
+	form.value.oldPassword = ''
+	form.value.newPassword = ''
+	form.value.confirmPassword = ''
+	router.push('/user/user')
+}
 </script>
 
 <template>
 	<b-card title="Zmena hesla" class="mx-auto" style="max-width: 400px;">
-		<b-form @submit.prevent="onSubmit">
+		<b-form @submit.prevent="onSubmit" @reset="onReset" >
 			<b-form-group label="Staré heslo" label-for="oldPassword">
 				<b-form-input
 					id="oldPassword"
@@ -93,9 +112,8 @@ const onSubmit = async () => {
 				</b-form-invalid-feedback>
 			</b-form-group>
 
-			<b-button type="submit" variant="primary" :disabled="!formValid">
-				Zmeniť heslo
-			</b-button>
+			<b-button class="mt-2" type="submit" variant="primary" :disabled="!formValid">Zmeniť heslo</b-button>
+			<b-button type="reset" variant="outline-secondary" class="ms-2 mt-2"><i class="fa-solid fa-rotate-left me-1"></i>Späť bez zmeny</b-button>
 		</b-form>
 	</b-card>
 </template>
