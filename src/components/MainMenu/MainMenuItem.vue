@@ -46,7 +46,7 @@ const childrenCount = computed(() => {
 			<main-menu-item
 				v-for="(item, index) in props.children"
 				:key="index"
-				:to="item.id"
+				:to="String(item.id)"
 				fa-icon="fa-hard-drive"
 				:text="item.name"
 				:children="item.sensors"

@@ -26,7 +26,7 @@ import { RouterLink } from 'vue-router'
 			</div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-end pt-2">
-					<RouterLink to="/user" class="btn btn-outline-secondary">
+					<RouterLink to="/user/user" class="btn btn-outline-secondary">
 						Viac info <i class="fa-solid fa-angles-right"></i>
 					</RouterLink>
 				</div>
