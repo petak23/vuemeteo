@@ -34,7 +34,7 @@ const submitForm = async () => {
 			if (response.data.status == 200) {
 				store.user = response.data.data
 				storeF.showMessage('Údaje boli úspešne zmenené.', 'success', 'OK', 5000)
-				router.push('/user')
+				router.push('/user/user')
 			}
 		})
 		.catch((error) => {
