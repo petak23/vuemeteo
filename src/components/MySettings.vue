@@ -22,7 +22,16 @@ const getMySettings = async () => {
 const getActualUser = async () => {
 	await MainService.getMyUserData()
 		.then(response => {
-			store.user = (response.data.status == 200) ? response.data.data : null
+			console.log(response.data)
+			if (response.data.status == 200) {
+				store.token = response.data.token
+				store.user = response.data.user
+				store.user_permission = response.data.permission
+			} else {
+				store.user = null
+				store.token = null
+				store.user_permission = null
+			}
 		})
 		.catch((error) => {
 			console.error(error)

@@ -18,10 +18,10 @@ const h1_text = computed(() => {
 
 <template>
   <div class="row">
-		<div class="col-12">
+		<div class="col-12 border-bottom">
 			<h1>{{ h1_text }}</h1>
 		</div>
-		<div class="col-12">
+		<div class="col-12 mt-2">
 			<user-info v-if="store.user != null && props.edit == 0" />
 			<user-change v-else-if="store.user != null && props.edit == 1" />
 			<password-change v-else-if="store.user != null && props.edit == 2" />

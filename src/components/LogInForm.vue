@@ -44,16 +44,17 @@ watch(() => password.value, () => {
 	}
 }*/
 
-function submit_form() {
+const submit_form = async () =>{
 	if (!email.value && !password.value) return
 	//if (!form.value) return
 	loading.value = true
 
-	MainService.postLogIn({ email: email.value, password: password.value })
+	await MainService.postLogIn({ email: email.value, password: password.value })
 	.then(response => {
 		//console.log(response.data);
 		store.token = response.data.token
-		store.user = response.data.user.data
+		store.user = response.data.user
+		store.user_permission = response.data.permission
 		visible_form.value = false
 		email.value = ""
 		password.value = ""
@@ -66,7 +67,7 @@ function submit_form() {
 		console.error('Login failed:', error);
 	});
 
-	setTimeout(() => (loading.value = false), 2000)
+	setTimeout(() => (loading.value = false), 60000)
 }
 
 onMounted(() => {

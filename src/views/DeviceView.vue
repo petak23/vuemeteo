@@ -61,11 +61,16 @@ onMounted(()=> {
 	else if (route.params.id > 0) getDevice(route.params.id) 
 	else setError("Chybné id: [" + props.id + "] zariadenia.(2)")
 })
+
+const h1_text = computed(() => {
+
+	return props.edit ? (props.id > 0 ? 'Editácia' : 'Pridanie') : 'Info' + "zariadenia:" + (props.id > 0 ? device_one.name : '')
+})
 </script>
 
 <template>
 	<div class="row">
-		<div class="col-12" v-if="device_one != null">
+		<div class="col-12 border-bottom" v-if="device_one != null">
 			<h1
 				class="d-flex justify-content-between"
 			>
@@ -83,8 +88,7 @@ onMounted(()=> {
 			</h1>
 
 		</div>
-		<hr />
-		<div class="col-12 row" v-if="error_message == '' && device_one != null">
+		<div class="col-12 mt-2 row" v-if="error_message == '' && device_one != null">
 			<device v-if="!props.edit" :device_item="device_one" />
 			<device-edit v-else :default-values="device_one" />
 		</div>

@@ -25,10 +25,10 @@ const store = useMainStore()
 			</div>
 		</header>
 		<main class="row">
-			<div class="col-12 col-sm-4 col-md-3 col-lg-2 overflow-y-auto bg-dark-subtle pb-3 border-end border-dark-subtle">
+			<div class="col-12 col-sm-4 col-lg-3 col-xl-2 overflow-y-auto bg-dark-subtle pb-3 border-end border-dark-subtle">
 				<main-menu />
 			</div>
-			<div class="col-12 col-sm-8 col-md-9 col-lg-10 d-flex justify-content-between pb-2"> 
+			<div class="col-12 col-sm-8 col-lg-9 col-xl-10 d-flex justify-content-between pb-2"> 
 				<RouterView />
 			</div>
 		</main>
