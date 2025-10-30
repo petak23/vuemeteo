@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch} from 'vue'
+import { onMounted, ref, watch, computed} from 'vue'
 import { RouterLink } from 'vue-router';
 import MainService from '../services/MainService'
 import Device from '../components/Devices/DeviceOneInfo.vue'

@@ -13,22 +13,55 @@ const store = useMainStore()
 	<div class="container-fluid">
 		<flash-message />
 		<my-settings />
-		<header class="row bg-primary-subtle p-0 border-bottom border-primary-subtle d-sm-flex justify-content-sm-between">
-			<RouterLink class="col-12 col-sm m-2 text-light-emphasis" to="/">
-				VueMeteo
-			</RouterLink>
-			<div class="col-12 col-sm text-sm-end mt-sm-2 me-3">
-				<span class="text-secondary-emphasis me-2">
-					<i class="fa-solid fa-user"></i>
-					{{ store.user != null ? store.user.prefix : '---' }}
-				</span>
-			</div>
-		</header>
-		<main class="row">
-			<div class="col-12 col-sm-4 col-lg-3 col-xl-2 overflow-y-auto bg-dark-subtle pb-3 border-end border-dark-subtle">
+		<BNavbar
+			v-b-color-mode="'dark'"
+			toggleable="sm"
+			variant="primary"
+			class="row bg-primary-subtle p-0 border-bottom border-primary-subtle"
+		>
+  		<BNavbarBrand to="/">VueMeteo</BNavbarBrand>
+  		<BNavbarToggle target="nav-collapse" />
+			<BCollapse
+				id="nav-collapse"
+				is-nav
+			>
+				<!--<BNavbarNav>
+					<BNavItem href="#navbar-overview">Link</BNavItem>
+					<BNavItem
+						href="#navbar-overview"
+						disabled
+						>Disabled</BNavItem
+					>
+				</BNavbarNav> -->
+				<!-- Right aligned nav items -->
+				<BNavbarNav class="ms-auto mb-2 mb-lg-0">
+					<BNavItem>
+						<RouterLink v-if="store.user != null" class="nav-link text-secondary-emphasis" to="/user/user">
+							<i class="fa-solid fa-user me-1"></i>
+							{{ store.user.prefix }}
+						</RouterLink>
+					</BNavItem>
+					<BNavItem>
+						<RouterLink class="nav-link" :to="store.user == null ? '/login' : '/logout'">
+							<i class="fa-solid me-1"
+								:class="store.user == null ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket'"
+							></i>
+							{{ store.user == null ? 'Prihlásenie' : 'Odhlásenie' }}
+						</RouterLink>
+					</BNavItem>
+				</BNavbarNav>	
+			</BCollapse>
+		</BNavbar>
+		<main class="row"
+			:class="store.user != null ? '' : 'justify-content-center'"
+		>
+			<div v-if="store.user != null"
+				class="col-12 col-sm-4 col-lg-3 col-xl-2 overflow-y-auto bg-dark-subtle pb-3 border-end border-dark-subtle">
 				<main-menu />
 			</div>
-			<div class="col-12 col-sm-8 col-lg-9 col-xl-10 d-flex justify-content-between pb-2"> 
+			<div class="col-12 pb-2"
+					:class="store.user != null ? 'col-sm-8 col-lg-9 col-xl-10 d-flex justify-content-between' : 'col-sm-8 col-md-6 col-lg-4'"
+			> 
 				<RouterView />
 			</div>
 		</main>
