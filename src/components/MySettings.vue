@@ -22,7 +22,7 @@ const getMySettings = async () => {
 const getActualUser = async () => {
 	await MainService.getMyUserData()
 		.then(response => {
-			console.log(response.data)
+			//console.log(response.data)
 			if (response.data.status == 200) {
 				store.token = response.data.token
 				store.user = response.data.user

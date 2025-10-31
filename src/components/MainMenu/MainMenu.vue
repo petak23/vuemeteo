@@ -23,12 +23,6 @@ const filteredMenu = computed(() =>
 			:text="item.name"
 			:children="item.children"
 		 />
-		<hr />
-
-		<main-menu-item
-			:to="store.user == null ? '/login' : '/logout'"
-			:fa-icon="store.user == null ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket'"
-			:text="store.user == null ? 'Prihlásenie' : 'Odhlásenie'" />
 	</ul>
 </template>
 

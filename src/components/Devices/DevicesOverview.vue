@@ -22,7 +22,7 @@ const getDevices = () => {
 			else {
 				items.value = null
 				emit('error', response.data)
-				console.error(response.data.message)
+				//console.error(response.data.message)
 			}
 		})
 		.catch((error) => {
