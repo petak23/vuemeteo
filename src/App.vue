@@ -59,8 +59,8 @@ const store = useMainStore()
 				class="col-12 col-sm-4 col-lg-3 col-xl-2 overflow-y-auto bg-dark-subtle pb-3 border-end border-dark-subtle">
 				<main-menu />
 			</div>
-			<div class="col-12 pb-2"
-					:class="store.user != null ? 'col-sm-8 col-lg-9 col-xl-10 d-flex justify-content-between' : 'col-sm-8 col-md-6 col-lg-4'"
+			<div class="col-12 col-sm-8 pb-2"
+					:class="store.user != null ? 'col-lg-9 col-xl-10' : 'col-md-6 col-lg-4'"
 			> 
 				<RouterView />
 			</div>

@@ -39,8 +39,11 @@ export default {
 	},
 	
 	postDeviceEdit(id_device, data) {
-		console.log(data)
+		//console.log(data)
 		return apiClient.post('device/' + id_device + '/edit', data)
+	},
+	postDeviceDelete(id_device) {
+		return apiClient.post('device/' + id_device + '/delete')
 	},
 
 	// User

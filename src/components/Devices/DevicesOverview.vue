@@ -43,20 +43,21 @@ onMounted(()=> {
 			</h5>
 			<div class="card-body">
 				<p class="card-text"><small>
-					{{ item.desc }}<br />
-					<span v-if="item.sensors.length">
+					{{ item.desc }}<br />{{ Object.keys(item.sensors).length }} senzorov.<br />
+					<span v-if="Object.keys(item.sensors).length">
 						Posledné meranie:<br />{{ format_date(Object.values(item.sensors)[0].last_data_time) }}
 					</span>
 					<span v-else class="text-danger">Nemám hodnoty o meraniach!</span>
 				</small></p>
-				<h6 class="card-title" v-if="item.sensors.length">Posledné hodnoty zo senzorov:</h6>
-				<ul class="list-group list-group-flush" v-if="item.sensors.length">
+				<h6 class="card-title" v-if="Object.keys(item.sensors).length">Posledné hodnoty zo senzorov:</h6>
+				<ul class="list-group list-group-flush" v-if="Object.keys(item.sensors).length">
 					<li 
 						v-for="sen in item.sensors"
 						:key="sen.id"
-						class="list-group-item text-bg-dark"
-					>
-						( {{ format_date(sen.last_data_time) }} ) {{ sen.last_out_value.toFixed(2) }} {{ sen.value_unit }}
+						class="list-group-item"
+					><small>
+						{{ sen.name }}( {{ format_date(sen.last_data_time) }} ) {{ sen.last_out_value.toFixed(2) }} {{ sen.value_unit }}
+						</small>
 					</li>
 				</ul>
 			</div>

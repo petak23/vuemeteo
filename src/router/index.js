@@ -64,7 +64,7 @@ const router = createRouter({
 			path: '/device/edit/:id',
 			name: 'Zariadenie - editácia',
 			component: () => import('../views/DeviceView.vue'),
-			props: { edit: true }
+			props: route => ({ id: Number(route.params.id), edit: true }),
 		},
 		{
 			path: '/sensor/:id',

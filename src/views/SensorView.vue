@@ -99,7 +99,7 @@ onMounted(()=> {
 	<div class="row px-2 bg-secondary-subtle">
 		<div class="col-12 col-md-4">Typ meraných dát:</div>
 		<div class="col-12 col-md-8"> 
-			<p v-if="sensor_one.id_device_classes == 1">
+			<p v-if="sensor_one.device_class == 1">
 				<b>1</b> - Kontinuálne so sumarizáciou.
 				<small>
 					<br>Predpokladá sa, že sa meria spojitá veličina ako je napríklad teplota, tlak alebo výška hladiny 
@@ -109,14 +109,14 @@ onMounted(()=> {
 					<br>Detailné namerané dáta sa po určitej dobe mažú, sumárne dáta zostávajú.
 				</small>
 			</p>
-			<p v-else-if="sensor_one.id_device_classes == 2">	
+			<p v-else-if="sensor_one.device_class == 2">	
 				<b>2</b> - Kontinuálne bez sumarizácie.
 				<small>
 					<br>Predpokladá sa, že sa meria spojitá veličina ako je napríklad teplota, tlak alebo výška hladiny. 
 					<br>Nepočitajú sa sumárne dáta.
 				</small>
 			</p>
-			<p v-else-if="sensor_one.id_device_classes == 3">
+			<p v-else-if="sensor_one.device_class == 3">
 				<b>3</b> - Impulzné dáta so sumarizáciou.
 				<small>
 					<br>Meria sa impulzná veličina - t.j. počet jednotiek načítaných z plynomera, počet preskočení zrážkomera atď.

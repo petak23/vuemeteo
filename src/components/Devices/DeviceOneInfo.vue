@@ -72,7 +72,8 @@ const rssiComputed = computed(() => {
 	<div class="col-12 col-md-2 bg-secondary-subtle">Prvné prihlásenie:</div>
 	<div class="col-12 col-md-10 bg-secondary-subtle">
 		<i v-if="item.first_login == null" class="text-danger">
-			Zariadenie sa ešte neprihlásilo cez rozhranie RatatoskrIoT, preto nebude vypísané v monitoringu.
+			Zariadenie sa ešte neprihlásilo cez prihlasovacie rozhranie, 
+			preto nebude vypísané v monitoringu.
 		</i>
 		<span v-else>{{ item.first_login }}</span>
 	</div>
