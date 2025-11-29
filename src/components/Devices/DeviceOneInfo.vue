@@ -89,10 +89,10 @@ const rssiComputed = computed(() => {
 	<div class="col-12 col-md-10 bg-light-subtle" v-else><b>{{ item.last_login }}</b></div>
 
 	<div class="col-12 col-md-2 bg-secondary-subtle">Posledná komunikácia:</div>
-	<div class="col-12 col-md-10 bg-secondary-subtle"><b>{{ item.lastComm }}</b></div>
+	<div class="col-12 col-md-10 bg-secondary-subtle"><b>{{ item.last_data_time }}</b></div>
 
 	<div class="col-12 col-md-2" v-if="item.uptime">Uptime:</div>
-	<div class="col-12 col-md-10" v-if="item.uptime"><b>{{ item.uptime }}</b> (pri poslednej komunikácii)</div>
+	<div class="col-12 col-md-10" v-if="item.uptime"><b>{{ item.uptime_readable }}</b> (pri poslednej komunikácii)</div>
 
 	<div class="col-12 col-md-2 bg-secondary-subtle" v-if="item.rssi">Sila WiFi signálu:</div>
 	<div class="col-12 col-md-10 bg-secondary-subtle" v-if="item.rssi">
