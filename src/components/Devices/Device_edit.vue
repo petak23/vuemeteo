@@ -1,12 +1,11 @@
 <script setup>
 import { reactive, computed, toRaw, ref } from 'vue'
-//import { BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BFormCheckbox, BFormTextarea, BButton } from 'bootstrap-vue-next'
 import MainService from '../../services/MainService'
 
 const props = defineProps({
 	defaultValues: {
 		type: Object,
-		default: () => ({})
+		default: null
 	}
 })
 
@@ -15,20 +14,34 @@ function generateToken(length = 40) {
 	return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
 }
 
+const id_device = ref(props.defaultValues != null ? props.defaultValues.id : 0)
+
 const form = reactive({
-	name: props.defaultValues.name_no_prefix || '',
-	passphrase: props.defaultValues.passphrase || '',
-	desc: props.defaultValues.desc || '',
-	json_token: props.defaultValues.json_token || generateToken(),
-	blob_token: props.defaultValues.blob_token || generateToken(),
-	monitoring: props.defaultValues.monitoring || false
+	name: (props.defaultValues != null && props.defaultValues.name_no_prefix) || null,
+	passphrase: (props.defaultValues != null && props.defaultValues.passphrase) || null,
+	desc: (props.defaultValues != null && props.defaultValues.desc) || null,
+	json_token: (props.defaultValues != null && props.defaultValues.json_token) || generateToken(),
+	blob_token: (props.defaultValues != null && props.defaultValues.blob_token) || generateToken(),
+	monitoring: (props.defaultValues != null && props.defaultValues.monitoring == 1) ? true : false,
 })
 
-const validName = computed(() => /^[0-9A-Za-z]*$/.test(form.name))
+const validName = computed(() => {
+	return form.name == null ? null :	/^[0-9A-Za-z]*$/.test(form.name)
+})
+
+const validPassphrase = computed(() => {
+	if (form.passphrase == null) return null
+	else return form.passphrase.length > 4 && form.passphrase.length <= 15})
+
+const validForm = computed(() => {
+	return validName.value && validPassphrase.value
+})
 
 const loading = ref(false)
 const responseMessage = ref('')
 const responseOk = ref(false)
+
+const emits = defineEmits(['update'])
 
 async function handleSubmit() {
 	if (!validName.value) {
@@ -41,12 +54,15 @@ async function handleSubmit() {
 	responseMessage.value = ''
 	responseOk.value = false
 
-	await MainService.postDeviceEdit(props.defaultValues.id, toRaw(form))
+	await MainService.postDeviceEdit(id_device.value, toRaw(form))
 	.then(response => {
 		const data = response.data
 		responseOk.value = data.status === 200
 		responseMessage.value = data.message || 'Neznáma odpoveď od servera.'
 		loading.value = false
+		if (responseOk.value) {
+			emits('update', response.data.device)
+		}
 	}).catch(error => {
 		console.error(error)
 		responseOk.value = false
@@ -62,7 +78,7 @@ async function handleSubmit() {
 
 <template>
 	<b-form @submit.prevent="handleSubmit">
-		<h6 class="border-top pt-1 mt-3"><strong>Základné údaje:</strong></h6>
+		<h6 class="pt-1"><strong>Základné údaje:</strong></h6>
 		<b-form-group label="Identifikátor(meno):" label-for="name" 
 			description="Toto meno doplnené prefixom bude používané pre prihlasovanie zariadenia. (Len znaky 0-9, A-Z, a-z)"
 		>
@@ -79,14 +95,20 @@ async function handleSubmit() {
 				Meno môže obsahovať len znaky 0-9, A-Z, a-z.
 			</b-form-invalid-feedback>
 		</b-form-group>
-		<b-form-group label="Komunikačné heslo:" label-for="passphrase">
+		<b-form-group label="Komunikačné heslo:" label-for="passphrase"
+			description="Dĺžka hesla 4 - 15 znakov."
+		>
 			<b-form-input
 				id="passphrase"
 				v-model="form.passphrase"
 				type="text"
+				:state="validPassphrase"
 				required
 				placeholder="Zadajte heslo"
 			/>
+			<b-form-invalid-feedback>
+				Dĺžka hesla musí byť v rozmedzí 4 až 15 znakov!
+			</b-form-invalid-feedback>
 		</b-form-group>
 		<b-form-group label="Popis:" label-for="description">
 			<b-form-textarea
@@ -134,7 +156,7 @@ async function handleSubmit() {
 			{{ responseMessage }}
 		</div>
 
-		<b-button type="submit" variant="primary" :disabled="loading">
+		<b-button type="submit" variant="primary" :disabled="!validForm || loading">
 			{{ loading ? 'Odosielam...' : 'Odoslať' }}
 		</b-button>
 	</b-form>

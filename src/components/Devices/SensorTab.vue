@@ -53,7 +53,7 @@ const props = defineProps({
 				<div class="col-1">
 					<Device_popover
 						:click_me="true"
-						:text_to_target="'#' + sensor.id_device_classes"
+						:text_to_target="'#' + sensor.device_class"
 						:text="sensor.dc_desc"
 					/>
 				</div>
