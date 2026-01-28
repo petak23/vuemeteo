@@ -49,6 +49,13 @@ export const useMainStore = defineStore('main', () => {
 			fa_icon: 'fa-walkie-talkie',
 			children: null
 		},
+		{
+			only_logged_in: true, // len prihlásený užívateľ
+			to: '/views',
+			name: 'Moje grafy',
+			fa_icon: 'fa-chart-line',
+			children: null
+		}
 	])
 
 	const devices = ref(null) // Pole zariadení
