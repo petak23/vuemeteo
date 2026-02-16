@@ -61,5 +61,10 @@ export default {
 	},
 	postChangePassword(id_user, data) {
 		return apiClient.post('user/passwordchange/' + id_user, data)
-	}
+	},
+
+	// Views
+	getViews() {
+		return apiClient.get('views')
+	},
 }

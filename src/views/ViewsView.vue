@@ -1,7 +1,25 @@
 <script setup>
-import {ref} from 'vue'
-import ViewsList from '../components/Views/ViewsList.vue';
+import { ref, onMounted } from 'vue'
+import ViewsSimpleList from '../components/Views/ViewsSimpleList.vue';
+import ViewsDetailList from '../components/Views/ViewsDetailList.vue';
+import MainService from '../services/MainService.js'
+
 const switchView = ref(false)
+const views = ref(null)
+
+onMounted(() => {
+	MainService.getViews()
+	.then(response => {
+		console.log(response.data);
+		if (response.data.status == 200)
+			views.value = response.data.data
+	})
+	.catch((error) => {
+		console.log(error);
+	});
+})
+
+
 </script>
 
 <template>
@@ -15,8 +33,20 @@ const switchView = ref(false)
 				<strong>Nový graf</strong>
 			</button>
 		</div>
-		<div class="col-12">		
-			<views-list :simpleView="switchView" />
+		<div class="col-12">
+			<div class="row">
+				<div class="col-12" v-if="views == null">
+					<div  class="text-center my-5">
+						<div class="spinner-border text-primary" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-12" v-else>
+					<views-simple-list v-if="!switchView" :views="views" />
+					<views-detail-list v-else :views="views" />
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
