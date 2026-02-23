@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import SensorInfo from '../components/Sensor/SensorInfo.vue'
+import SensorStat from '../components/Sensor/SensorStat.vue'
 import MainService from '../services/MainService'
 
 import { useRoute } from 'vue-router'
@@ -12,9 +13,10 @@ const store = useMainStore()
 const props = defineProps({
 	id: { type: Number, default: 0 },
 	edit: { type: Boolean, default: false},
+	mode: { type: String, default: 'view' }
 })
 
-const h1_text = ref('Informácie')
+//const h1_text = ref('Informácie')
 const sensor_one = ref(null)
 const error_message = ref("")
 
@@ -51,6 +53,10 @@ watch(() => route.params.id, (newId) => {
 	else setError("Chybné id: [" + newId + "] senzoru.(3)")
 })
 
+const h1_text = computed(() => {
+	return props.mode == 'stat' ? "Štatistika" : "Informácie" 
+})
+
 onMounted(()=> {
 	if (props.id > 0) getSensor(props.id)
 	else if (route.params.id > 0) getSensor(route.params.id) 
@@ -67,6 +73,11 @@ onMounted(()=> {
 
 	<sensor-info 
 		:sensor="sensor_one" 
+		v-if="props.mode == 'view'"
+	/>
+	<sensor-stat 
+		:sensor_one="sensor_one" 
+		v-else-if="props.mode == 'stat'"
 	/>
 	
 </div>

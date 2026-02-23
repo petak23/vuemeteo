@@ -101,7 +101,7 @@ const sensorWarnMim = computed(() => {
 			<RouterLink :to="'/device/'+props.sensor.device_id" class="btn btn-outline-primary btn-sm" role="button"><i class="fa-solid fa-rotate-left me-1"></i>Späť k zariadeniu</RouterLink>
 			<RouterLink to="/devices" class="btn btn-outline-primary btn-sm" role="button"><i class="fa-solid fa-rotate-left me-1"></i>Späť na zoznam zariadení</RouterLink>
 			<a n:href=":Chart:sensor $sensor['id'], current: 1" class="btn btn-outline-primary btn-sm disabled" role="button"><i class="fa-solid fa-chart-line me-1"></i>Graf hodnôt</a>
-			<a n:href=":Chart:sensorstat $sensor['id']" class="btn btn-outline-primary btn-sm  disabled" ><i class="fa-solid fa-chart-simple me-1"></i>Štatistika dát</a>
+			<RouterLink :to="'/sensor/stat/'+props.sensor.id" class="btn btn-outline-primary btn-sm" ><i class="fa-solid fa-chart-simple me-1"></i>Štatistika dát</RouterLink>
 			<a n:href="Sensor:edit $sensor['id']" class="btn btn-outline-primary btn-sm disabled" role="button"><i class="fa-solid fa-pencil me-1"></i>Upraviť senzor</a>
 		</div>
 	</div>
