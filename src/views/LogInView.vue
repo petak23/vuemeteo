@@ -1,9 +1,23 @@
 <script setup>
+import { onMounted } from 'vue'
 import LogInForm from '../components/LogInForm.vue'
+import { useMainStore } from '../stores/main'
+import { useRouter } from 'vue-router'
+
+const store = useMainStore()
+const router = useRouter()
+
 const props = defineProps({
 	logOut: {
 		type: Boolean,
 		default: false,
+	}
+})
+
+// Presmerovanie na Homepage ak je užívateľ prihlásený
+onMounted(() => {
+	if (store.token && store.user && !props.logOut) {
+		router.push('/')
 	}
 })
 </script>

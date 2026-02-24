@@ -73,6 +73,12 @@ const router = createRouter({
 			component: () => import('../views/SensorView.vue')
 		},
 		{
+			path: '/sensor/stat/:id',
+			name: 'Senzor - štatistika',
+			props: route => ({ id: Number(route.params.id), mode: 'stat' }),
+			component: () => import('../views/SensorView.vue')
+		},
+		{
 			path: '/views',
 			name: 'Moje grafy',
 			component: () => import('../views/ViewsView.vue')
