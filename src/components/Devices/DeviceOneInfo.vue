@@ -173,7 +173,7 @@ const rssiComputed = computed(() => {
 		<br><small><a :href="item.jsonUrl">{{ item.jsonUrl }}</a></small>
 		<br>Pokiaľ je zariadenie meteostanice so senzormi teploty a zrážok, je možné získať data pre display meteostanice tu:
 		<br><small><a :href="item.jsonUrl2">{{ item.jsonUrl2 }}</a></small>
-		<br><small>Každý, kdo pozná tieto URL, si môže data zobraziť. Prístup k JSON súboru už <b>nie je chránený heslom</b>.</small>
+		<br><small>Každý, kto pozná tieto URL, si môže data zobraziť. Prístup k JSON súboru už <b>nie je chránený heslom</b>.</small>
 	</div>
 
 	<div class="col-12 border-top mt-1 pt-2" v-if="item.blob_token">

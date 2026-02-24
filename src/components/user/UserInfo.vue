@@ -62,7 +62,7 @@ const store = useMainStore()
 		<b><a :href="store.user.monitoringUrl" target="_blank">{{ store.user.monitoringUrl }}</a></b>
 		<br />
 		<small>
-			Každý, kdo pozná túto URL, si môže data zobraziť. Prístup už ďalej <b>nieje chránený heslom</b>.
+			Každý, kto pozná túto URL, si môže data zobraziť. Prístup už ďalej <b>nie je chránený heslom</b>.
 		</small>
 	</div>
 
@@ -70,7 +70,7 @@ const store = useMainStore()
 	<div class="row px-2 pt-4 pb-2">
 		<div class="col-12">
 			<h3>Retencia dát</h3>
-			Uložené data staršie než určený čas budú zmazané.
+			Uložené data staršie ako určité obdobie budú zmazané.
 		</div>
 	</div>
 

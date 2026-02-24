@@ -10,7 +10,7 @@ NEDOKONČENÉ ...
 
 <!--<div class="row px-2  pt-3">
 	<div class="col-12">
-		<a n:href="Device:show $id" class="btn btn-outline-primary btn-sm" role="button">Zpět beze změny</a>
+		<a n:href="Device:show $id" class="btn btn-outline-primary btn-sm" role="button">Späť bez zmeny</a>
 	</div>
 </div>-->
 

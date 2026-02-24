@@ -74,13 +74,14 @@ const props = defineProps({
 					/>
 					<i>{{ sensor.desc }}</i>
 				</div>
-				<div class="col-6 col-md-2"><!-- TODO links -->
-					<a aria-disabled="true" class="btn btn-link btn-sm disabled text-warning-emphasis pe-2" 
-					  :href="'../chart/sensorstat/show/' + sensor.id + '/?current=1'"
+				<div class="col-6 col-md-2">
+					<RouterLink class="btn btn-link btn-sm text-warning-emphasis pe-2" 
+					  :to="'/sensor/stat/' + sensor.id"
 						title="Štatistika"
 					>
 						<i class="fa-solid fa-chart-simple"></i>
-					</a>
+					</RouterLink>
+					<!-- TODO links -->
 					<a 
 						aria-disabled="true" class="btn btn-link btn-sm disabled text-warning-emphasis pe-2"
 						:href="'../chart/sensor/show/' + sensor.id + '/?current=1'"
