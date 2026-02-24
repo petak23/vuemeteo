@@ -102,8 +102,7 @@ const store = useMainStore()
 	<div class="row px-2  pt-3">
 		<div class="col-12">
 			<RouterLink to="/devices" class="btn btn-outline-primary btn-sm me-2" role="button">Zariadenia</RouterLink>
-			<!-- TODO link-->
-			<a aria-disabled="true" :href="'View:views'" class="btn btn-outline-primary btn-sm disabled" role="button">Grafy</a>
+			<RouterLink to="/views" class="btn btn-outline-primary btn-sm me-2" role="button">Grafy</RouterLink>
 		</div>
 	</div>
 </div>
