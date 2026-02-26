@@ -9,18 +9,18 @@ const props = defineProps({
       desc: "",
       msg_rate: 3600,
       display_nodata_interval: 7200,
-      preprocess_data: false,
-      preprocess_factor: 1.0,
-      warn_max: false,
-      warn_max_val: 0,
-      warn_max_val_off: 0,
+      preprocess_data: 0,
+      preprocess_factor: null,
+      warn_max: 0,
+      warn_max_val: null,
+      warn_max_val_off: null,
       warn_max_after: 0,
-      warn_max_text: "",
-      warn_min: false,
-      warn_min_val: 0,
-      warn_min_val_off: 0,
+      warn_max_text: null,
+      warn_min: 0,
+      warn_min_val: null,
+      warn_min_val_off: null,
       warn_min_after: 0,
-      warn_min_text: "",
+      warn_min_text: null,
     }),
   },
 });
@@ -204,7 +204,6 @@ const handleCancel = () => {
               type="text"
               maxlength="50"
               class="form-control"
-              placeholder="Nepovinné"
             />
             <small class="form-text text-muted d-block">Tento text bude súčasťou varovania. (Maximálne 50 znakov)</small>
           </div>
