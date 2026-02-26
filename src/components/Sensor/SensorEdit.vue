@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from "vue"
-import MainService from '../services/MainService'
+import MainService from '../../services/MainService'
 
 const props = defineProps({
   sensor: {
