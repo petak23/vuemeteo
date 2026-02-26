@@ -45,6 +45,12 @@ export default {
 	postDeviceDelete(id_device) {
 		return apiClient.post('device/' + id_device + '/delete')
 	},
+	postSensorEdit(id_sensor, data) { // TODO Over v API
+		return apiClient.post('sensor/' + id_sensor + '/edit', data)
+	},
+	postSensorDelete(id_sensor) {			// TODO Over v API
+		return apiClient.post('sensor/' + id_sensor + '/delete')
+	},
 
 	// User
 	postLogIn(data) {

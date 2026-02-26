@@ -2,6 +2,7 @@
 import { onMounted, ref, watch, computed } from 'vue'
 import SensorInfo from '../components/Sensor/SensorInfo.vue'
 import SensorStat from '../components/Sensor/SensorStat.vue'
+import SensorEdit from '../components/Sensor/SensorEdit.vue'
 import MainService from '../services/MainService'
 
 import { useRoute } from 'vue-router'
@@ -78,6 +79,11 @@ onMounted(()=> {
 	<sensor-stat 
 		:sensor_one="sensor_one" 
 		v-else-if="props.mode == 'stat'"
+	/>
+	<sensor-edit 
+		:sensor="sensor_one" 
+		v-else-if="props.mode == 'edit'"
+		@save="getSensor(props.id)"
 	/>
 	
 </div>
