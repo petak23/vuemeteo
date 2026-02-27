@@ -30,6 +30,25 @@ const rssiComputed = computed(() => {
 	else out = '<i class="text-danger fas fa-exclamation-triangle"></i> Zlá kvalita signálu - očakávajte problémy.'
 	return out
 })
+
+// human-readable uptime string from seconds
+const uptimeReadable = computed(() => {
+	const secs = item.value.uptime || 0
+	let remaining = secs
+	const days = Math.floor(remaining / 86400)
+	remaining %= 86400
+	const hours = Math.floor(remaining / 3600)
+	remaining %= 3600
+	const minutes = Math.floor(remaining / 60)
+	const seconds = remaining % 60
+	const parts = []
+	if (days) parts.push(`${days}d`)
+	if (hours) parts.push(`${hours}hod`)
+	if (minutes) parts.push(`${minutes}min`)
+	// always show seconds if nothing else or if >0
+	if (seconds || parts.length === 0) parts.push(`${seconds}sec`)
+	return parts.join(' ')
+})
 </script>
 
 <template>
@@ -69,7 +88,7 @@ const rssiComputed = computed(() => {
 	<div class="col-12 col-md-2 bg-light-subtle">Prevádzkovaná aplikácia:</div>
 	<div class="col-12 col-md-10 bg-light-subtle">{{ item.app_name }}</div>
 
-	<div class="col-12 col-md-2 bg-secondary-subtle">Prvné prihlásenie:</div>
+	<div class="col-12 col-md-2 bg-secondary-subtle">Prvé prihlásenie:</div>
 	<div class="col-12 col-md-10 bg-secondary-subtle">
 		<i v-if="item.first_login == null" class="text-danger">
 			Zariadenie sa ešte neprihlásilo cez prihlasovacie rozhranie, 
@@ -92,7 +111,7 @@ const rssiComputed = computed(() => {
 	<div class="col-12 col-md-10 bg-secondary-subtle"><b>{{ item.last_data_time }}</b></div>
 
 	<div class="col-12 col-md-2" v-if="item.uptime">Uptime:</div>
-	<div class="col-12 col-md-10" v-if="item.uptime"><b>{{ item.uptime_readable }}</b> (pri poslednej komunikácii)</div>
+	<div class="col-12 col-md-10" v-if="item.uptime"><b>{{ uptimeReadable }}</b> (pri poslednej komunikácii)</div>
 
 	<div class="col-12 col-md-2 bg-secondary-subtle" v-if="item.rssi">Sila WiFi signálu:</div>
 	<div class="col-12 col-md-10 bg-secondary-subtle" v-if="item.rssi">

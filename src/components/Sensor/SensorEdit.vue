@@ -136,7 +136,7 @@ const handleCancel = () => {
       </div>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" v-if="formData.device_class == 1 || formData.device_class == 2">
       <div class="card-header">
         <h5 class="mb-0">Poplach pri vysokej hodnote</h5>
       </div>
@@ -211,7 +211,7 @@ const handleCancel = () => {
       </div>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" v-if="formData.device_class == 1 || formData.device_class == 2">
       <div class="card-header">
         <h5 class="mb-0">Poplach pri nízkej hodnote</h5>
       </div>
