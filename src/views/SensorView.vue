@@ -77,7 +77,7 @@ onMounted(()=> {
 		v-if="props.mode == 'view'"
 	/>
 	<sensor-stat 
-		:sensor_one="sensor_one" 
+		:sensor="sensor_one" 
 		v-else-if="props.mode == 'stat'"
 	/>
 	<sensor-edit 
