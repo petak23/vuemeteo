@@ -35,7 +35,7 @@ const  getSensor = async (id) => {
 			}
 			else {
 				setError(response.data.message)
-				device_one.value = null
+				sensor_one.value = null
 			}
 		})
 		.catch((error) => {
@@ -67,26 +67,35 @@ onMounted(()=> {
 
 <template>
 
-<div class="col-12" v-if="sensor_one != null">
-	<div class="pb-3 pt-3 px-2">
-		<h1>Senzor {{ sensor_one.dev_name }}:{{ sensor_one.name }} - <small>{{ h1_text }}</small></h1>
+	<div class="col-12" v-if="sensor_one != null">
+		<div class="pb-3 pt-3 px-2">
+			<h1>Senzor {{ sensor_one.dev_name }}:{{ sensor_one.name }} - <small>{{ h1_text }}</small></h1>
+		</div>
+
+		<sensor-info 
+			:sensor="sensor_one" 
+			v-if="props.mode == 'view'"
+		/>
+		<sensor-stat 
+			:sensor="sensor_one" 
+			v-else-if="props.mode == 'stat'"
+		/>
+		<sensor-edit 
+			:sensor="sensor_one" 
+			v-else-if="props.mode == 'edit'"
+			@save="getSensor(props.id)"
+		/>
+		
+	</div>
+	<div class="col-12" v-else>
+		<div class="pb-3 pt-3 px-2">
+			<h1>Senzor - <small>{{ h1_text }}</small></h1>
+		</div>
+		<div class="alert alert-danger" role="alert">
+			{{ error_message }}
+		</div>
 	</div>
 
-	<sensor-info 
-		:sensor="sensor_one" 
-		v-if="props.mode == 'view'"
-	/>
-	<sensor-stat 
-		:sensor="sensor_one" 
-		v-else-if="props.mode == 'stat'"
-	/>
-	<sensor-edit 
-		:sensor="sensor_one" 
-		v-else-if="props.mode == 'edit'"
-		@save="getSensor(props.id)"
-	/>
-	
-</div>
 </template>
 
 <style lang="scss" scoped>

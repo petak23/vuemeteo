@@ -64,9 +64,11 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 			Je tu 
 			<b>{{ sensorStats.measureStats.count }}</b> záznamov od 
 			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$measureStats->min_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
-			>{{ sensorStats.measureStats.min_time }}</a> <!--| date:'d.m.Y'--> 
+				class="btn btn-link disabled p-0" aria-disabled="true"
+				>{{ sensorStats.measureStats.min_time }}</a> <!--| date:'d.m.Y'--> 
 			do 
 			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$measureStats->max_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
+				class="btn btn-link disabled p-0" aria-disabled="true"
 			>{{ sensorStats.measureStats.max_time }}</a>.<!--| date:'d.m.Y'-->
 		</span>
 		<span v-else>
