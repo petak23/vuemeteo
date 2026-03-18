@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router';
+import ChartHeader from '../Chart/ChartHeader.vue';
 
 const props = defineProps({
 	sensor: {
@@ -7,7 +8,6 @@ const props = defineProps({
 		default: null
 	}
 })
-
 
 </script>
 
@@ -26,84 +26,15 @@ const props = defineProps({
   </RouterLink>
 </div>
 
-<div class="px-2 mb-2" >
-	<form action="?" method="get">
-	<table width="100%" cellspacing="0" cellpadding="3" border="0">
-		<tr>
-			<td>&nbsp;</td>
-			<td align="center">
-				Předvolby: 
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&currentday=1">Aktuálny deň.</a>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&current=1">Posledné tri dni.</a>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&currentweek=1">Posledný týždeň.</a>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&currentmonth=1">Posledný mesiac.</a>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&currentyear=1">Tento rok.</a>
-			</td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&minus=1"
-					alt="Predchádzajúce obdobie"
-					title="Predchádzajúce obdobie"
-					><i class="fa fa-arrow-circle-left fa-2x"></i></a>
-			</td>
-			<td align="center">
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&minusYear=1"
-					>[- rok]</a>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&minusMon=1"
-					>[- mesiac]</a>
-				Zobraz 
-				<select name="lenDays">
-					<option value="1" {if ($lenDays==1)}selected{/if}>1 deň</option>
-					<option value="3" {if ($lenDays==3)}selected{/if}>3 dni</option>
-					<option value="8" {if ($lenDays==8)}selected{/if}>týždeň</option>
-					<option value="31" {if ($lenDays==31)}selected{/if}>mesiac</option>
-					<option value="92" {if ($lenDays==92)}selected{/if}>3 mesiace</option>
-					<option value="183" {if ($lenDays==183)}selected{/if}>pol roka</option>
-					<option value="366" {if ($lenDays==366)}selected{/if}>rok</option>
-				</select>
-				od
-				<input type="date" name="dateFrom" size=8  value="{$dateFrom}">
-				<input type="submit" name="draw" value="Zobraz!">
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&plusMon=1"
-					>[+ mesiac]</a>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&plusYear=1"
-					>[+ rok]</a>
-			</td>
-			<td>
-				<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&plus=1"
-					alt="Ďalšie obdobie"
-					title="Ďalšie obdobie"
-					><i class="fa fa-arrow-circle-right fa-2x"></i></a>
-			</td>
-		</tr>
-		{if ($allowCompare)}
-			<tr>
-				<td>
-				</td>
-				<td align="center">
-					<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&altminus=1"
-						>[- rok]</a>
-					
-					Porovnávací rok: 
-					<select name="altYear">
-						<option value="" {if ($altYear=="")}selected{/if}></option>
-						{foreach $years as $year}
-							<option value="{$year}" {if ($altYear==$year)}selected{/if}>{$year}</option>
-						{/foreach}
-					</select>
-					<input type="submit" name="draw" value="Zobraz!">
-					<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$dateFrom}&lenDays={$lenDays}&altYear={$altYear}&altplus=1"
-						>[+ rok]</a>
-				</td>
-				<td>
-				</td>
-			</tr>
-		{/if}
-	</table>
-	</form> 
-</div>
+<chart-header
+	:dateFrom="props.dateFrom"
+	:lenDays="props.lenDays"
+	:altYear="props.altYear"
+	@update:dateFrom="(value) => props.dateFrom = value"
+	@update:lenDays="(value) => props.lenDays = value"
+	@update:altYear="(value) => props.altYear = value"
+	@submit="submitForm"
+/>
 
 <div class="px-2 mb-2" >
 	<img 
