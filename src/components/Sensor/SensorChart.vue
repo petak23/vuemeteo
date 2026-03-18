@@ -92,11 +92,11 @@ const props = defineProps({
 		<li><b>Kompozit</b> - Spracovávajú sa dáta z viacerých senzorov a použijú sa tie, ktoré sú dostupné.</li>
 	{/if}
 	{if ($source1) }
-<li><b>Automatické dáta</b> - Pre úseky dlhšie než 90 dní sa vykreslí len maximum a minimum v každom dni. 
+	<li><b>Automatické dáta</b> - Pre úseky dlhšie než 90 dní sa vykreslí len maximum a minimum v každom dni. 
 				Pre úseky od 6 do 90 dní sa zobrazujú maximá a minimá v každej hodine - na výsledných grafoch to takmer nie je rozlišiteľné oproti priamym dátam. 
 				Pre kratšie úseky sa pre ne-kompozitné dáta stará maximálne {$dataRetentionDays} dní použijú priamo namerané hodnoty; pre kompozitnú sériu (z viacerých senzorov)
 				alebo dáta staršie než limit sa použijú hodinové maximá a minimá.
-		</i></li>
+	</li>
 	{/if}
 	<li>Najstaršie dáta v databáze sú z roku {$minYear}.</li>
 	</ul></small>

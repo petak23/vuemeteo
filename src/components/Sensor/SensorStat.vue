@@ -190,7 +190,7 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 		<small>
 		Vysvetlivky a poznámky:
 		<ul>
-			<li v-for="de in sensorStats.devices">
+			<li v-for="de in sensorStats.devices" :key="de.name">
 				<b>{{ de.name }}</b> - {{ de.desc }}
 			</li>
 		<li>Najstaršie dáta v databáze sú z roku {{ sensorStats.years.slice(-1)[0] }}.</li>
