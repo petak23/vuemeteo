@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue'
 
 const props = defineProps({
   id: { type: [String, Number], required: true },
-  dateFrom: { type: String, default: '' },
+  dateFrom: { type: String, default: () => new Date().toISOString().split('T')[0] },
   lenDays: { type: Number, default: 1 },
   altYear: { type: [String, Number], default: '' },
   allowCompare: { type: Boolean, default: false },
@@ -79,7 +79,7 @@ function submitForm() {
         <tr>
           <td>&nbsp;</td>
           <td align="center">
-            Předvolby:
+            Predvoľby:
             <a :href="makeLink({ currentday: 1 })">Aktuálny deň.</a>
             <a :href="makeLink({ current: 1 })">Posledné tri dni.</a>
             <a :href="makeLink({ currentweek: 1 })">Posledný týždeň.</a>
@@ -112,7 +112,7 @@ function submitForm() {
               <option value="366">rok</option>
             </select>
             od
-            <input type="date" v-model="form.dateFrom" />
+            <input type="date" v-model="form.dateFrom" aria-label="date"/>
             <button type="submit">Zobraz!</button>
             <a :href="makeLink({ plusMon: 1 })">[+ mesiac]</a>
             <a :href="makeLink({ plusYear: 1 })">[+ rok]</a>

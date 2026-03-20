@@ -19,10 +19,12 @@ const props = defineProps({
 </div>
 
 <div class="px-2 mb-3" >
-	<RouterLink :to="'/sensor/' + props.sensor.id" class="btn btn-primary btn-sm" role="button">Späť</RouterLink>
+	<RouterLink :to="'/sensor/' + props.sensor.id" class="btn btn-primary btn-sm" role="button">
+		<i class="fa-solid fa-rotate-left me-1"></i>Späť
+	</RouterLink>
 
 	<RouterLink :to="'/sensor/stat/' + props.sensor.id + '/?dateFrom=' + props.dateFrom + '&lenDays=' + props.lenDays + '&altYear=' + props.altYear" class="btn btn-outline-primary btn-sm" role="button">
-    Zobraziť štatistiku
+    <i class="fa-solid fa-chart-simple"></i>Zobraziť štatistiku
   </RouterLink>
 </div>
 

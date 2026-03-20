@@ -135,7 +135,7 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 				</tr>
 			</thead>
 
-				<tr v-for="ms in sensorStats.mesicniSumarizace">
+				<tr v-for="ms in sensorStats.mesicniSumarizace" >
 					<td><b>{{$rok}}</b></td>
 					<td>{{ props.sensor.unit}}</td>
 					<td class="text-right"><b>{$rocniHodnoty['celkem'] |number:1, ',', ' ' }</b></td>
@@ -164,18 +164,14 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 			<tr>
 				<td><b>{$rok}</b></td>
 				<td>{{ props.sensor.unit}}</td>
-				{for $i = 1; $i <= 12; $i++}
-					<td class="text-right">
-						{if isset($rocniHodnoty[$i])}
-							<span class="text-danger">{$rocniHodnoty[$i]['max'] |number:1, ',', ' ' }</span>
-							<br>
-							{$rocniHodnoty[$i]['avg'] |number:1, ',', ' ' }
-							<br>
-							<span class="text-primary">{$rocniHodnoty[$i]['min'] |number:1, ',', ' ' }</span>
-						{else}
-						{/if}
-					</td>
-				{/for}
+				<td v-for="i in 12" :key="i" class="text-right">
+					{if isset($rocniHodnoty[$i])}
+						<div class="text-danger py-0 my-0">{$rocniHodnoty[$i]['max'] |number:1, ',', ' ' }</div>
+						<div class="text-secondary py-0 my-0">{$rocniHodnoty[$i]['avg'] |number:1, ',', ' ' }</div>
+						<div class="text-primary py-0 my-0">{$rocniHodnoty[$i]['min'] |number:1, ',', ' ' }</div>
+					{else}
+					{/if}
+				</td>
 			</tr>
 		</table>
 
