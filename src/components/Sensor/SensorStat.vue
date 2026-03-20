@@ -96,10 +96,10 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 			<b>{{ sensorStats.sumdataCount.day }}</b> denných záznamov 
 			od
 			<!-- TODO links -->
-			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$sumdataStats->min_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
+			<a :href="'../../../../chart/sensor/show/' + props.sensor.id + '/?dateFrom=' + sensorStats.sumdataStats.min_date + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
 			>{{ sensorStats.sumdataStats.min_date }}</a> 
 			do 
-			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$sumdataStats->max_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
+			<a :href="'../../../../chart/sensor/show/' + props.sensor.id + '/?dateFrom=' + sensorStats.sumdataStats.max_date + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
 			>{{ sensorStats.sumdataStats.max_date }}</a>.
 		</span>
 		<span v-else-if="props.sensor.device_class == 2">

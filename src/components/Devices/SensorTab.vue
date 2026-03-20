@@ -81,14 +81,13 @@ const props = defineProps({
 					>
 						<i class="fa-solid fa-chart-simple"></i>
 					</RouterLink>
-					<!-- TODO link -->
-					<a 
-						aria-disabled="true" class="btn btn-link btn-sm disabled text-warning-emphasis pe-2"
-						:href="'../chart/sensor/show/' + sensor.id + '/?current=1'"
+					<RouterLink 
+						class="btn btn-link btn-sm text-warning-emphasis pe-2"
+						:to="'/chart/sensor/' + sensor.id + '/?current=1'"
 						title="Graf"
 					>
 						<i class="fa-solid fa-chart-line"></i>
-					</a> 
+					</RouterLink>
 					<RouterLink class="btn btn-link btn-sm text-warning-emphasis"
 						:to="'/sensor/edit/' + sensor.id" title="Edit">
 						<i class="fa-solid fa-pencil"></i>
