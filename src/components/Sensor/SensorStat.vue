@@ -90,16 +90,17 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 		<h3>Sumárne dáta</h3>	
 
 		<b>Štatistika:</b>
-		<span v-if="sensorStats.sumdataStats && sensorStats.sumdataStats.min_time != null">
+		<span v-if="sensorStats.sumdataStats && sensorStats.sumdataStats.min_date != null">
 			Je tu
 			<b>{{ sensorStats.sumdataCount.hour }}</b> hodinových a 
 			<b>{{ sensorStats.sumdataCount.day }}</b> denných záznamov 
 			od
+			<!-- TODO links -->
 			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$sumdataStats->min_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
-			>{{ sensorStats.sumdataStats.min_time }}</a> 
+			>{{ sensorStats.sumdataStats.min_date }}</a> 
 			do 
 			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$sumdataStats->max_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
-			>{{ sensorStats.sumdataStats.max_time }}</a>.
+			>{{ sensorStats.sumdataStats.max_date }}</a>.
 		</span>
 		<span v-else-if="props.sensor.device_class == 2">
 			Pre toto zariadenie nie sú počítané sumárne dáta.
@@ -135,18 +136,13 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 				</tr>
 			</thead>
 
-				<tr v-for="ms in sensorStats.mesicniSumarizace" >
-					<td><b>{{$rok}}</b></td>
+				<tr v-for="(rokData, rok) in sensorStats.mesicniSumarizace" :key="rok">
+					<td><b>{{ rok }}</b></td>
 					<td>{{ props.sensor.unit}}</td>
-					<td class="text-right"><b>{$rocniHodnoty['celkem'] |number:1, ',', ' ' }</b></td>
-					{for $i = 1; $i <= 12; $i++}
-						<td class="text-right">
-							{if isset($rocniHodnoty[$i])}
-								{$rocniHodnoty[$i] |number:1, ',', ' ' }
-							{else}
-							{/if}
-						</td>
-					{/for}
+					<td class="text-right"><b>{{ rokData.celkem }}</b></td>
+					<td class="text-right" v-for="i in 12" :key="i">
+						<span v-if="rokData[i] != undefined">{{ rokData[i] }}</span>
+					</td>
 				</tr>
 				
 		</table>
@@ -161,16 +157,13 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 					<th v-for="i in 12" :key="i" class="text-right">{{ String(i).padStart(2, '0') }}</th>
 				</tr>
 			</thead>
-			<tr>
-				<td><b>{$rok}</b></td>
+			<tr v-for="(rokData, rok) in sensorStats.mesicniSumarizace" :key="rok">
+				<td><b>{{ rok }}</b></td>
 				<td>{{ props.sensor.unit}}</td>
-				<td v-for="i in 12" :key="i" class="text-right">
-					{if isset($rocniHodnoty[$i])}
-						<div class="text-danger py-0 my-0">{$rocniHodnoty[$i]['max'] |number:1, ',', ' ' }</div>
-						<div class="text-secondary py-0 my-0">{$rocniHodnoty[$i]['avg'] |number:1, ',', ' ' }</div>
-						<div class="text-primary py-0 my-0">{$rocniHodnoty[$i]['min'] |number:1, ',', ' ' }</div>
-					{else}
-					{/if}
+				<td class="text-right" v-for="i in 12" :key="i">
+					<div v-if="rokData[i] != undefined" class="text-danger py-0 my-0">{{ rokData[i].max }}</div>
+					<div v-if="rokData[i] != undefined" class="text-secondary py-0 my-0">{{ rokData[i].avg }}</div>
+					<div v-if="rokData[i] != undefined" class="text-primary py-0 my-0">{{ rokData[i].min }}</div>
 				</td>
 			</tr>
 		</table>
@@ -184,12 +177,13 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 
 	<div class="px-2 mb-2" v-if="sensorStats != null">
 		<small>
-		Vysvetlivky a poznámky:
-		<ul>
-			<li v-for="de in sensorStats.devices" :key="de.name">
-				<b>{{ de.name }}</b> - {{ de.desc }}
-			</li>
-		<li>Najstaršie dáta v databáze sú z roku {{ sensorStats.years.slice(-1)[0] }}.</li>
-		</ul></small>
+			Vysvetlivky a poznámky:
+			<ul>
+				<li v-for="de in sensorStats.devices" :key="de.name">
+					<b>{{ de.name }}</b> - {{ de.desc }}
+				</li>
+				<li>Najstaršie dáta v databáze sú z roku {{ sensorStats.years.slice(-1)[0] }}.</li>
+			</ul>
+		</small>
 	</div>
 </template>
