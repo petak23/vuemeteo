@@ -6,13 +6,12 @@ const props = defineProps({
 	dateFrom: { type: String, default: () => new Date().toISOString().split('T')[0] },
 	lenDays: { type: Number, default: 1 },
 	altYear: { type: [String, Number], default: '' },
-	allowCompare: { type: Boolean, default: false },
+	allowCompare: { type: Boolean, default: true },
 	years: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits([/*'update:dateFrom', 'update:lenDays', 'update:altYear',*/
-													'update:minus', 'update:plus', 'update:current',
-													/*'update:altminus', 'update:altplus', */])
+const emit = defineEmits(['update:dateFrom', 'update:lenDays', 'update:altYear',
+													'update:minus', 'update:plus', 'update:current'])
 
 const form = reactive({
 	dateFrom: props.dateFrom,
@@ -38,24 +37,18 @@ watch(
 		form.altYear = value
 	}
 )
-
-/*watch(
-	() => ({ ...form }),
+watch(
+	() => form.dateFrom,
 	(value) => {
-		//emit('update:dateFrom', value.dateFrom)
-		//emit('update:lenDays', Number(value.lenDays))
-		//emit('update:altYear', value.altYear)
-	},
-	{ deep: true }
-)*/
-
-const baseQuery = computed(() => {
-	const params = new URLSearchParams()
-	params.set('dateFrom', form.dateFrom || '')
-	params.set('lenDays', String(form.lenDays || 1))
-	params.set('altYear', String(form.altYear || ''))
-	return params.toString()
-})
+		dateFromSend(value)
+	}
+)
+watch(
+	() => form.lenDays,
+	(value) => {
+		emit('update:lenDays', Number(value))
+	}
+)
 
 const currentSend = (val) => {
 	emit("update:current", val)
@@ -66,100 +59,115 @@ const minustSend = (val) => {
 const plusSend = (val) => {
 	emit("update:plus", val)
 }
-
-function makeLink(extra = {}) {
-	const params = new URLSearchParams(baseQuery.value)
-
-	Object.entries(extra).forEach(([key, value]) => {
-		params.set(key, String(value))
-	})
-
-	//const query = params.toString()
-	//console.log('Generated link with query:', query)
-	//emit('update', params)
-	//return `../../../../chart/sensor/show/${encodeURIComponent(props.id)}/?${query}`
+const dateFromSend = (val) => {
+	emit("update:dateFrom", val)
 }
 
 function submitForm() {
-	//const url = makeLink({})
-	//window.location.href = url
 }
 </script>
 
 <template>
-	<div class="px-2 mb-2">
-		<form @submit.prevent="submitForm">
-			<table width="100%" cellspacing="0" cellpadding="3" border="0">
-				<tr>
-					<td>&nbsp;</td>
-					<td align="center">
-						Predvoľby:
-						<div class="btn-group" role="group" aria-label="Predvoľby">
-							<button type="button" @click="currentSend('day')" class="btn btn-outline-primary btn-sm">Aktuálny deň.</button>
-							<button type="button" @click="currentSend('now')" class="btn btn-outline-primary btn-sm">Posledné tri dni.</button>
-							<button type="button" @click="currentSend('week')" class="btn btn-outline-primary btn-sm">Posledný týždeň.</button>
-							<button type="button" @click="currentSend('month')" class="btn btn-outline-primary btn-sm">Posledný mesiac.</button>
-							<button type="button" @click="currentSend('year')" class="btn btn-outline-primary btn-sm">Tento rok.</button>
+	<div class="col-12">
+		<table width="100%" class="table table-borderless table-sm border border-warning">
+			<tbody>
+			<tr>
+				<td :rowspan="props.allowCompare ? 3 : 2" class="align-middle">
+					<button
+						@click="minustSend('now')"
+						alt="Predchádzajúce obdobie"
+						title="Predchádzajúce obdobie"
+						class="btn btn-link"
+					>
+						<i class="fa fa-arrow-circle-left fa-2x"></i>
+					</button>
+				</td>
+				<td class="align-center">
+					Predvoľby:
+					<div class="btn-group" role="group" aria-label="Predvoľby">
+						<button type="button" @click="currentSend('day')" class="btn btn-outline-secondary btn-sm">Aktuálny deň.</button>
+						<button type="button" @click="currentSend('now')" class="btn btn-outline-secondary btn-sm">Posledné tri dni.</button>
+						<button type="button" @click="currentSend('week')" class="btn btn-outline-secondary btn-sm">Posledný týždeň.</button>
+						<button type="button" @click="currentSend('month')" class="btn btn-outline-secondary btn-sm">Posledný mesiac.</button>
+						<button type="button" @click="currentSend('year')" class="btn btn-outline-secondary btn-sm">Tento rok.</button>
+					</div>
+				</td>
+				<td :rowspan="props.allowCompare ? 3 : 2" class="align-middle">
+					<button
+						@click="plusSend('now')"
+						alt="Ďalšie obdobie"
+						title="Ďalšie obdobie"
+						class="btn btn-link"
+					>
+						<i class="fa fa-arrow-circle-right fa-2x"></i>
+					</button>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="align-center">
+					<div class="row">
+						<div class="col btn-group" role="group" aria-label="Posun obdobia">
+							<button @click="minustSend('year')" class="btn btn-outline-secondary btn-sm">- rok</button>
+							<button @click="minustSend('month')" class="btn btn-outline-secondary btn-sm">- mesiac</button>
 						</div>
-					</td>
-					<td>&nbsp;</td>
-				</tr>
-
-				<tr>
-					<td>
-						<button
-							@click="minustSend('now')"
-							alt="Predchádzajúce obdobie"
-							title="Predchádzajúce obdobie"
-							class="btn btn-link"
-						>
-							<i class="fa fa-arrow-circle-left fa-2x"></i>
-						</button>
-					</td>
-					<td align="center">
-						<a :href="makeLink({ minusYear: 1 })">[- rok]</a>
-						<a :href="makeLink({ minusMon: 1 })">[- mesiac]</a>
-						Zobraz
-						<select v-model.number="form.lenDays">
-							<option value="1">1 deň</option>
-							<option value="3">3 dni</option>
-							<option value="8">týždeň</option>
-							<option value="31">mesiac</option>
-							<option value="92">3 mesiace</option>
-							<option value="183">pol roka</option>
-							<option value="366">rok</option>
-						</select>
-						od
-						<input type="date" v-model="form.dateFrom" aria-label="date"/>
-						<button type="submit">Zobraz!</button>
-						<a :href="makeLink({ plusMon: 1 })">[+ mesiac]</a>
-						<a :href="makeLink({ plusYear: 1 })">[+ rok]</a>
-					</td>
-					<td>
-						<a
-							:href="makeLink({ plus: 1 })"
-							alt="Ďalšie obdobie"
-							title="Ďalšie obdobie"
-							><i class="fa fa-arrow-circle-right fa-2x"></i></a
-						>
-					</td>
-				</tr>
-
-				<tr v-if="props.allowCompare">
-					<td></td>
-					<td align="center">
-						<a :href="makeLink({ altminus: 1 })">[- rok]</a>
-						Porovnávací rok:
-						<select v-model="form.altYear">
-							<option value=""></option>
-							<option v-for="year in props.years" :key="year" :value="year">{{ year }}</option>
-						</select>
-						<button type="submit">Zobraz!</button>
-						<a :href="makeLink({ altplus: 1 })">[+ rok]</a>
-					</td>
-					<td></td>
-				</tr>
-			</table>
-		</form>
+						<div class="col">
+							Zobraz
+						</div>
+						<div class="col">
+							<select class="form-select form-select-sm" 
+								v-model.number="form.lenDays"
+								aria-label="Dĺžka obdobia"
+								style="min-width: 8em;"
+							>
+								<option value="1">1 deň</option>
+								<option value="3">3 dni</option>
+								<option value="8">týždeň</option>
+								<option value="31">mesiac</option>
+								<option value="92">3 mesiace</option>
+								<option value="183">pol roka</option>
+								<option value="366">rok</option>
+							</select>
+						</div>
+						<div class="col">
+							Od:
+						</div>
+						<div class="col">
+							<input 
+								type="date" 
+								v-model="form.dateFrom"
+								:max="new Date().toISOString().split('T')[0]" 
+								aria-label="date" id="date_from"/>
+						</div>
+						<div class="col btn-group" role="group" aria-label="Posun obdobia">
+							<button @click="plusSend('month')" class="btn btn-outline-secondary btn-sm">+ mesiac</button>
+							<button @click="plusSend('year')" class="btn btn-outline-secondary btn-sm">+ rok</button>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr v-if="props.allowCompare">
+				<td class="align-center">
+					<div class="row">
+						<div class="col btn-group" role="group" aria-label="Posun obdobia">
+							<button @click="minustSend('altyear')" class="btn btn-outline-secondary btn-sm">- rok</button>
+						</div>
+						<div class="col">
+							Porovnávací rok:
+						</div>
+						<div class="col">
+							<select class="form-select form-select-sm" v-model="form.altYear">
+								<option value=""></option>
+								<option v-for="year in props.years" :key="year" :value="year">{{ year }}</option>
+							</select>
+						</div>
+						<div class="col btn-group" role="group" aria-label="Posun obdobia">
+							<button @click="plusSend('altyear')" class="btn btn-outline-secondary btn-sm">+ rok</button>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+		</table>
 	</div>
 </template>
