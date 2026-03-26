@@ -4,19 +4,21 @@ import { computed, reactive, watch } from 'vue'
 const props = defineProps({
 	id: { type: [String, Number], required: true },
 	dateFrom: { type: String, default: () => new Date().toISOString().split('T')[0] },
-	lenDays: { type: Number, default: 1 },
-	altYear: { type: [String, Number], default: '' },
+	lenDays: { type: Number, default: 3 },
+	altYear: { type: [String, Number], default: null },
 	allowCompare: { type: Boolean, default: true },
 	years: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['update:dateFrom', 'update:lenDays', 'update:altYear',
-													'update:minus', 'update:plus', 'update:current'])
+													'update:minus', 'update:plus', 
+													'update:link',
+												])
 
 const form = reactive({
 	dateFrom: props.dateFrom,
 	lenDays: props.lenDays,
-	altYear: props.altYear ?? '',
+	altYear: props.altYear ?? null,
 })
 
 watch(
@@ -49,21 +51,86 @@ watch(
 		emit('update:lenDays', Number(value))
 	}
 )
+watch
+(
+	() => form.altYear,
+	(value) => {
+		if (value === "") {
+			form.altYear = null
+		}
+		emit('update:altYear', form)
+	}
+)
 
-const currentSend = (val) => {
-	emit("update:current", val)
+function addDays(dateStr, days = 0) {
+  const d = new Date(dateStr)      // 2026-03-26
+  d.setDate(d.getDate() + days)    // + alebo - dní
+  return d.toISOString().split('T')[0]
 }
-const minustSend = (val) => {
-	emit("update:minus", val)
+
+const updateLink = (val) => {
+	const d = new Date().toISOString().split('T')[0]
+	switch (val) {
+		case 'day':
+			form.dateFrom = addDays(d)
+			form.lenDays = 1
+			break;
+		case 'now':
+			form.dateFrom = addDays(d, -2)
+			form.lenDays = 3
+			break;
+		case 'week':
+			form.dateFrom = addDays(d, -7)
+			form.lenDays = 8
+			break;
+		case 'month':
+			form.dateFrom = addDays(d, -30)
+			form.lenDays = 31
+			break;
+		case 'year':
+			form.dateFrom = new Date(Date.UTC(d.getFullYear(), 0, 1)).toISOString().split('T')[0]
+			form.lenDays = 366
+			break;
+		case 'minus':
+			form.dateFrom = addDays(form.dateFrom, -form.lenDays)
+			break;
+		case 'plus':
+			form.dateFrom = addDays(form.dateFrom, form.lenDays)
+			break;
+		case 'minusyear':
+			form.dateFrom = addDays(form.dateFrom, -365)
+			break;
+		case 'minusmonth':
+			form.dateFrom = addDays(form.dateFrom, -30)
+			break;
+		case 'plusmonth':
+			form.dateFrom = addDays(form.dateFrom, +30)
+			break;
+		case 'plusyear':
+			form.dateFrom = addDays(form.dateFrom, +365)
+			break;
+		default:
+			break;
+	}
+
+	emit('update:link', form)
 }
-const plusSend = (val) => {
-	emit("update:plus", val)
+
+const updateAltYear = (val) => {
+	switch (val) {
+		case 'minus':
+			form.altYear = form.altYear ? Number(form.altYear) - 1 : null
+			break;
+		case 'plus':
+			form.altYear = form.altYear ? Number(form.altYear) + 1 : null
+			break;
+		default:
+			break;
+	}
+	//emit("update:altYear", form) // emit by sa mal udiať cez watch
 }
 const dateFromSend = (val) => {
 	emit("update:dateFrom", val)
-}
-
-function submitForm() {
 }
 </script>
 
@@ -74,7 +141,7 @@ function submitForm() {
 			<tr>
 				<td :rowspan="props.allowCompare ? 3 : 2" class="align-middle">
 					<button
-						@click="minustSend('now')"
+						@click="updateLink('minus')"
 						alt="Predchádzajúce obdobie"
 						title="Predchádzajúce obdobie"
 						class="btn btn-link"
@@ -85,16 +152,16 @@ function submitForm() {
 				<td class="align-center">
 					Predvoľby:
 					<div class="btn-group" role="group" aria-label="Predvoľby">
-						<button type="button" @click="currentSend('day')" class="btn btn-outline-secondary btn-sm">Aktuálny deň.</button>
-						<button type="button" @click="currentSend('now')" class="btn btn-outline-secondary btn-sm">Posledné tri dni.</button>
-						<button type="button" @click="currentSend('week')" class="btn btn-outline-secondary btn-sm">Posledný týždeň.</button>
-						<button type="button" @click="currentSend('month')" class="btn btn-outline-secondary btn-sm">Posledný mesiac.</button>
-						<button type="button" @click="currentSend('year')" class="btn btn-outline-secondary btn-sm">Tento rok.</button>
+						<button type="button" @click="updateLink('day')" class="btn btn-outline-secondary btn-sm">Aktuálny deň.</button>
+						<button type="button" @click="updateLink('now')" class="btn btn-outline-secondary btn-sm">Posledné tri dni.</button>
+						<button type="button" @click="updateLink('week')" class="btn btn-outline-secondary btn-sm">Posledný týždeň.</button>
+						<button type="button" @click="updateLink('month')" class="btn btn-outline-secondary btn-sm">Posledný mesiac.</button>
+						<button type="button" @click="updateLink('year')" class="btn btn-outline-secondary btn-sm">Tento rok.</button>
 					</div>
 				</td>
 				<td :rowspan="props.allowCompare ? 3 : 2" class="align-middle">
 					<button
-						@click="plusSend('now')"
+						@click="updateLink('plus')"
 						alt="Ďalšie obdobie"
 						title="Ďalšie obdobie"
 						class="btn btn-link"
@@ -108,8 +175,8 @@ function submitForm() {
 				<td class="align-center">
 					<div class="row">
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">
-							<button @click="minustSend('year')" class="btn btn-outline-secondary btn-sm">- rok</button>
-							<button @click="minustSend('month')" class="btn btn-outline-secondary btn-sm">- mesiac</button>
+							<button @click="updateLink('minusyear')" class="btn btn-outline-secondary btn-sm">- rok</button>
+							<button @click="updateLink('minusmonth')" class="btn btn-outline-secondary btn-sm">- mesiac</button>
 						</div>
 						<div class="col">
 							Zobraz
@@ -140,8 +207,8 @@ function submitForm() {
 								aria-label="date" id="date_from"/>
 						</div>
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">
-							<button @click="plusSend('month')" class="btn btn-outline-secondary btn-sm">+ mesiac</button>
-							<button @click="plusSend('year')" class="btn btn-outline-secondary btn-sm">+ rok</button>
+							<button @click="updateLink('plusmonth')" class="btn btn-outline-secondary btn-sm">+ mesiac</button>
+							<button @click="updateLink('plusyear')" class="btn btn-outline-secondary btn-sm">+ rok</button>
 						</div>
 					</div>
 				</td>
@@ -150,7 +217,7 @@ function submitForm() {
 				<td class="align-center">
 					<div class="row">
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">
-							<button @click="minustSend('altyear')" class="btn btn-outline-secondary btn-sm">- rok</button>
+							<button @click="updateAltYear('minus')" class="btn btn-outline-secondary btn-sm">- rok</button>
 						</div>
 						<div class="col">
 							Porovnávací rok:
@@ -162,7 +229,7 @@ function submitForm() {
 							</select>
 						</div>
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">
-							<button @click="plusSend('altyear')" class="btn btn-outline-secondary btn-sm">+ rok</button>
+							<button @click="updateAltYear('plus')" class="btn btn-outline-secondary btn-sm">+ rok</button>
 						</div>
 					</div>
 				</td>

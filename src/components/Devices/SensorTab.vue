@@ -83,7 +83,7 @@ const props = defineProps({
 					</RouterLink>
 					<RouterLink 
 						class="btn btn-link btn-sm text-warning-emphasis pe-2"
-						:to="'/chart/sensor/' + sensor.id + '/?current=1'"
+						:to="'/chart/sensor/' + sensor.id"
 						title="Graf"
 					>
 						<i class="fa-solid fa-chart-line"></i>

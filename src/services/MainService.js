@@ -21,6 +21,10 @@ const apiClient = axios.create({
 })
 
 export default {
+	getBaseUrl() {
+		return baseUrl
+	},
+
 	getMySettings() {
 		return apiClient.get('homepage/myappsettings')
 	},
@@ -75,4 +79,9 @@ export default {
 	getViews() {
 		return apiClient.get('views')
 	},
+
+	// Chart
+	getChartSensor($id_sensor, params) {
+		return apiClient.get('chart/sensor/' + $id_sensor, { params: params })
+	}
 }

@@ -63,13 +63,13 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 		<span v-if="sensorStats.measureStats && sensorStats.measureStats.count > 0">
 			Je tu 
 			<b>{{ sensorStats.measureStats.count }}</b> záznamov od 
-			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$measureStats->min_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
-				class="btn btn-link disabled p-0" aria-disabled="true"
-				>{{ sensorStats.measureStats.min_time }}</a> <!--| date:'d.m.Y'--> 
+			<RouterLink :to="'/chart/sensor/' + props.sensor.id + '/?dateFrom=' + sensorStats.measureStats.min_time + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
+				class="btn btn-link p-0"
+				>{{ sensorStats.measureStats.min_time }}</RouterLink> 
 			do 
-			<a href="../../../../chart/sensor/show/{$id}/?dateFrom={$measureStats->max_time |date:'Y-m-d'}&lenDays={$lenDays}&altYear={$altYear}"
-				class="btn btn-link disabled p-0" aria-disabled="true"
-			>{{ sensorStats.measureStats.max_time }}</a>.<!--| date:'d.m.Y'-->
+				<RouterLink :to="'/chart/sensor/' + props.sensor.id + '/?dateFrom=' + sensorStats.measureStats.max_time + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
+				class="btn btn-link p-0"
+			>{{ sensorStats.measureStats.max_time }}</RouterLink>.
 		</span>
 		<span v-else>
 			Nie sú dostupné žiadne detailné dáta.
@@ -95,12 +95,11 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 			<b>{{ sensorStats.sumdataCount.hour }}</b> hodinových a 
 			<b>{{ sensorStats.sumdataCount.day }}</b> denných záznamov 
 			od
-			<!-- TODO links -->
-			<a :href="'../../../../chart/sensor/show/' + props.sensor.id + '/?dateFrom=' + sensorStats.sumdataStats.min_date + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
-			>{{ sensorStats.sumdataStats.min_date }}</a> 
+			<RouterLink :to="'/chart/sensor/' + props.sensor.id + '/?dateFrom=' + sensorStats.sumdataStats.min_date + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
+			>{{ sensorStats.sumdataStats.min_date }}</RouterLink> 
 			do 
-			<a :href="'../../../../chart/sensor/show/' + props.sensor.id + '/?dateFrom=' + sensorStats.sumdataStats.max_date + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
-			>{{ sensorStats.sumdataStats.max_date }}</a>.
+			<RouterLink :to="'/chart/sensor/' + props.sensor.id + '/?dateFrom=' + sensorStats.sumdataStats.max_date + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
+			>{{ sensorStats.sumdataStats.max_date }}</RouterLink>.
 		</span>
 		<span v-else-if="props.sensor.device_class == 2">
 			Pre toto zariadenie nie sú počítané sumárne dáta.
