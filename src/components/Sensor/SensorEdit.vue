@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue"
+import { ref, watch, toRaw } from "vue"
 import MainService from '../../services/MainService'
 
 const props = defineProps({
@@ -38,10 +38,10 @@ watch(
 );
 
 const handleSubmit = () => {
-	MainService.postSensorEdit(props.sensor.id, formData.value)
+	MainService.postSensorEdit(props.sensor.id, toRaw(formData.value))
 		.then(response => {
 			if (response.data.status == 200) {
-				emit("save", formData.value);
+				emit("save", response.data.sensor);
 			} else {
 				console.error("Error saving sensor:", response.data.message);
 			}
@@ -286,9 +286,14 @@ const handleCancel = () => {
 		</div>
 
 		<div class="d-flex gap-2 mb-4">
-			<button type="submit" class="btn btn-primary">Uložiť</button>
+			<button type="submit" class="btn btn-success">
+				<i class="fa-solid fa-check me-1"></i>Uložiť
+			</button>
 			<button type="button" class="btn btn-secondary" @click="handleCancel">
 				Zrušiť
+			</button>
+			<button type="button" class="btn btn-danger ms-4" @click="handleDelete">
+				<i class="fa-solid fa-circle-exclamation me-1"></i>Odstrániť senzor
 			</button>
 		</div>
 	</form>

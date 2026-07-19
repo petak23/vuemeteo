@@ -8,13 +8,15 @@ const props = defineProps({
 
 const sensorWarnMax = computed(() => {
 	return props.sensor.warn_max == 1 ?
-					"Pre &gt;=<b>" + props.sensor.warn_max_val+"</b>"+props.sensor.unit+" zasielame '<b>"+props.sensor.warn_max_text+"</b>'"
+					"Pre &gt;= <b>" + props.sensor.warn_max_val+"</b> "+props.sensor.unit+" zasielame text: '<b>"+props.sensor.warn_max_text+"</b>'"
+					+ (props.sensor.warn_max_after > 0 ? " po <b>"+props.sensor.warn_max_after+"</b> sekundách" : "")
 					: "-" 
 })
 
 const sensorWarnMim = computed(() => {
 	return props.sensor.warn_min == 1 ?
-					"Pre &gt;=<b>" + props.sensor.warn_min_val+"</b>"+props.sensor.unit+" zasielame '<b>"+props.sensor.warn_min_text+"</b>'"
+					"Pre &gt;= <b>" + props.sensor.warn_min_val+"</b> "+props.sensor.unit+" zasielame text: '<b>"+props.sensor.warn_min_text+"</b>'"
+					+ (props.sensor.warn_min_after > 0 ? " po <b>"+props.sensor.warn_min_after+"</b> sekundách" : "")
 					: "-" 
 })
 </script>
@@ -88,11 +90,11 @@ const sensorWarnMim = computed(() => {
 	</div>
 	<div class="row px-2 bg-light-subtle">
 		<div class="col-12 col-md-4">Upozornenie na maximum:</div>
-		<div class="col-12 col-md-8">{{ sensorWarnMax }}</div>
+		<div class="col-12 col-md-8" v-html="sensorWarnMax"></div>
 	</div>
 	<div class="row px-2 bg-secondary-subtle">
 		<div class="col-12 col-md-4">Upozornenie na minimum:</div>
-		<div class="col-12 col-md-8">{{ sensorWarnMim }}
+		<div class="col-12 col-md-8" v-html="sensorWarnMim">
 		</div>
 	</div>
 

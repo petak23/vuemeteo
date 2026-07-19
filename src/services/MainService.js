@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-const baseUrl = "http://localhost/apimeteo/"
-//const baseUrl = "https://apimeteo.echo-msz.eu/"
+//const baseUrl = "http://localhost/apimeteo/"
+const baseUrl = "https://apimeteo.echo-msz.eu/"
 
 //console.log(window.location.origin)
 //const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "https://apimeteo.echo-msz.eu/" 
@@ -51,11 +51,11 @@ export default {
 	postDeviceDelete(id_device) {
 		return apiClient.post('device/' + id_device + '/delete')
 	},
-	postSensorEdit(id_sensor, data) { // TODO Over v API
-		return apiClient.post('sensor/' + id_sensor + '/edit', data)
+	postSensorEdit(id_sensor, data) {
+		return apiClient.post('sensor/edit/' + id_sensor , data)
 	},
 	postSensorDelete(id_sensor) {			// TODO Over v API
-		return apiClient.post('sensor/' + id_sensor + '/delete')
+		return apiClient.post('sensor/delete/' + id_sensor , data)
 	},
 
 	// User

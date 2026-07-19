@@ -5,8 +5,9 @@ import SensorStat from '../components/Sensor/SensorStat.vue'
 import SensorEdit from '../components/Sensor/SensorEdit.vue'
 import MainService from '../services/MainService'
 
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
+const router = useRouter()
 
 import { useMainStore } from '../stores/main'
 const store = useMainStore()
@@ -17,7 +18,6 @@ const props = defineProps({
 	mode: { type: String, default: 'view' }
 })
 
-//const h1_text = ref('Informácie')
 const sensor_one = ref(null)
 const error_message = ref("")
 
@@ -30,7 +30,8 @@ const  getSensor = async (id) => {
 	await MainService.getSensor(id)
 		.then(response => {
 			if (response.data.status == 200) {
-				sensor_one.value = response.data
+				sensor_one.value = response.data.sensor
+				// console.log(sensor_one.value)
 				store.setActualDeviceId(sensor_one.value.device_id, sensor_one.value.id)
 			}
 			else {
@@ -42,6 +43,14 @@ const  getSensor = async (id) => {
 			setError(error)
 			console.error(error)
 		})
+}
+
+const getSavedSensor = (sensor) => {
+	sensor_one.value = sensor
+
+	if (sensor?.id) {
+		router.push(`/sensor/${sensor.id}`)
+	}
 }
 
 watch(() => props.id, () => {
@@ -83,7 +92,7 @@ onMounted(()=> {
 		<sensor-edit 
 			:sensor="sensor_one" 
 			v-else-if="props.mode == 'edit'"
-			@save="getSensor(props.id)"
+			@save="getSavedSensor"
 		/>
 		
 	</div>
