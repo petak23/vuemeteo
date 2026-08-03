@@ -41,6 +41,7 @@ const getActualUser = async () => {
 onMounted(() => {
 	getMySettings()
 	getActualUser()
+	store.getDevices()
 })
 </script>
 

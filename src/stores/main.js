@@ -1,5 +1,6 @@
 import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
+import MainService from '../services/MainService'
 
 export const useMainStore = defineStore('main', () => {
 
@@ -118,10 +119,30 @@ export const useMainStore = defineStore('main', () => {
 			})
 	}
 
+	const getDevices = () => {
+		MainService.getDevices()
+			.then(response => {
+				if (response.data.status == 200) {
+					devices.value = response.data.data
+					addDevicesToMenu()
+				}
+				else {
+					devices.value = null
+					// emit('error', response.data)
+					console.error(response.data.message)
+				}
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
+
 	return { 
 		baseUrl, apiPath, appName, links, dataRetentionDays, minYear, user, token, 
 		main_menu, 
 		devices, addDevicesToMenu, setActualDeviceId, resetActualDeviceId, actual_device_id, actual_sensor_id,
-		checkUserPermission, getActualUser, user_permission
+		checkUserPermission, getActualUser, user_permission,
+		getDevices
 	}
 })

@@ -78,7 +78,7 @@ onMounted(()=> {
 
 	<div class="col-12" v-if="sensor_one != null">
 		<div class="pb-3 pt-3 px-2">
-			<h1>Senzor {{ sensor_one.dev_name }}:{{ sensor_one.name }} - <small>{{ h1_text }}</small></h1>
+			<h1>Senzor {{ sensor_one.dev_name }}: <b>{{ sensor_one.name }}</b> - <small>{{ h1_text }}</small></h1>
 		</div>
 
 		<sensor-info 
@@ -93,6 +93,8 @@ onMounted(()=> {
 			:sensor="sensor_one" 
 			v-else-if="props.mode == 'edit'"
 			@save="getSavedSensor"
+			@cancel="router.push('/sensor/' + sensor_one.id)"
+			@delete="router.push('/device/' + sensor_one.device_id)"
 		/>
 		
 	</div>
@@ -108,5 +110,7 @@ onMounted(()=> {
 </template>
 
 <style lang="scss" scoped>
-
+h1 > small {
+	font-size: 70%;
+}
 </style>

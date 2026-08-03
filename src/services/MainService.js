@@ -6,7 +6,7 @@ const baseUrl = "https://apimeteo.echo-msz.eu/"
 
 //console.log(window.location.origin)
 //const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "https://apimeteo.echo-msz.eu/" 
-console.log("Base URL: " + baseUrl)
+//console.log("Base URL: " + baseUrl)
 
 axios.defaults.withCredentials = true;
 
@@ -54,8 +54,8 @@ export default {
 	postSensorEdit(id_sensor, data) {
 		return apiClient.post('sensor/edit/' + id_sensor , data)
 	},
-	postSensorDelete(id_sensor) {			// TODO Over v API
-		return apiClient.post('sensor/delete/' + id_sensor , data)
+	getSensorDelete(id_sensor) {
+		return apiClient.get('sensor/delete/' + id_sensor)
 	},
 
 	// User

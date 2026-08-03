@@ -88,7 +88,7 @@ const updateLink = (val) => {
 			form.lenDays = 31
 			break;
 		case 'year':
-			form.dateFrom = new Date(Date.UTC(d.getFullYear(), 0, 1)).toISOString().split('T')[0]
+			form.dateFrom = new Date(Date.UTC(new Date().getFullYear(), 0, 1)).toISOString().split('T')[0]
 			form.lenDays = 366
 			break;
 		case 'minus':

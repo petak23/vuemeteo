@@ -1,43 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import MainService from '../../services/MainService'
 import dayjs from 'dayjs'; //https://day.js.org/docs/en/display/format
 import Device_popover from './Device_popover.vue';
 import SensorTab from './SensorTab.vue';
 
 import { useMainStore } from '../../stores/main'
 const store = useMainStore()
-
-onMounted(()=> {
-	getDevices();
-})
-
 		
 const format_date = (value) => {
 	if (value == null) return "---"
 	const date = dayjs(value);
 	// Then specify how you want your dates to be formatted
 	return date.format('D.M.YYYY HH:mm:ss')
-}
-
-const emit = defineEmits(['error'])
-
-const getDevices = () => {
-	MainService.getDevices()
-		.then(response => {
-			if (response.data.status == 200) {
-				store.devices = response.data.data
-				store.addDevicesToMenu()
-			}
-			else {
-				store.devices = null
-				emit('error', response.data)
-				console.error(response.data.message)
-			}
-		})
-		.catch((error) => {
-			console.error(error);
-		});
 }
 </script>
 

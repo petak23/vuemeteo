@@ -25,18 +25,10 @@ const store = useMainStore()
 				id="nav-collapse"
 				is-nav
 			>
-				<!--<BNavbarNav>
-					<BNavItem href="#navbar-overview">Link</BNavItem>
-					<BNavItem
-						href="#navbar-overview"
-						disabled
-						>Disabled</BNavItem
-					>
-				</BNavbarNav> -->
 				<!-- Right aligned nav items -->
 				<BNavbarNav class="ms-auto mb-2 mb-lg-0">
 					<BNavItem>
-						<RouterLink v-if="store.user != null" class="nav-link text-secondary-emphasis" to="/user/user">
+						<RouterLink v-if="store.user != null" class="nav-link" to="/user/user">
 							<i class="fa-solid fa-user me-1"></i>
 							{{ store.user.prefix }}
 						</RouterLink>

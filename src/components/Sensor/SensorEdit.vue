@@ -1,6 +1,13 @@
 <script setup>
 import { ref, watch, toRaw } from "vue"
 import MainService from '../../services/MainService'
+import SensorDeleteModal from './SensorDeleteModal.vue'
+
+import { useMainStore } from '../../stores/main'
+const store = useMainStore()
+
+import { useFlashStore } from '../FlashMessages/store/flash'
+const storeF = useFlashStore()
 
 const props = defineProps({
 	sensor: {
@@ -41,18 +48,48 @@ const handleSubmit = () => {
 	MainService.postSensorEdit(props.sensor.id, toRaw(formData.value))
 		.then(response => {
 			if (response.data.status == 200) {
+				storeF.showMessage('Údaje senzora boli úspešne zmenené.', 'success', 'OK', 5000)
 				emit("save", response.data.sensor);
 			} else {
+				storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
 				console.error("Error saving sensor:", response.data.message);
 			}
 		})
 		.catch(error => {
+			storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
 			console.error("Error saving sensor:", error);
 		});
 };
 
 const handleCancel = () => {
 	emit("cancel");
+};
+const handleDelete = (id) => {
+	if (!props.sensor || !props.sensor.id) {
+		console.error("Invalid sensor ID for deletion.");
+		storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+		return;
+	}
+	if (id !== props.sensor.id) {
+		console.error(`Mismatched sensor ID for deletion. Expected: ${props.sensor.id}, Received: ${id}`);
+		storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+		return;
+	}
+	MainService.getSensorDelete(props.sensor.id)
+		.then(response => {
+			if (response.data.status == 200) {
+				storeF.showMessage('Senzor bol úspešne vymazaný.', 'success', 'OK', 5000)
+				store.getDevices()
+				emit("delete", props.sensor.id);
+			} else {
+				storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+				console.error("Error deleting sensor:", response.data.message);
+			}
+		})
+		.catch(error => {
+			storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+			console.error("Error deleting sensor:", error);
+		});
 };
 </script>
 
@@ -292,9 +329,10 @@ const handleCancel = () => {
 			<button type="button" class="btn btn-secondary" @click="handleCancel">
 				Zrušiť
 			</button>
-			<button type="button" class="btn btn-danger ms-4" @click="handleDelete">
-				<i class="fa-solid fa-circle-exclamation me-1"></i>Odstrániť senzor
-			</button>
+			<SensorDeleteModal 
+				@deletem="handleDelete"
+				:sensor="props.sensor"
+			/>
 		</div>
 	</form>
 </template>

@@ -13,9 +13,9 @@ const item = ref({id: 0, name: 'none'})
 const viewConfigModal = ref(false)
 
 onMounted(()=> {
-	console.log(props)
+	//console.log(props)
 	if (props.device_item != null) item.value = props.device_item
-	console.log(item.value)
+	//console.log(item.value)
 })
 
 watch(() => props.device_item, () => {

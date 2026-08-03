@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import UserInfo from '../components/user/UserInfo.vue'
 import UserChange from '../components/user/UserChange.vue'
 import PasswordChange from '../components/user/PasswordChange.vue'
@@ -13,6 +13,10 @@ const props = defineProps({
 
 const h1_text = computed(() => {
 	return props.edit ? 'Zmena nastavenia účtu' : 'Užívateľ'
+})
+
+onMounted(() => {
+	store.resetActualDeviceId()
 })
 </script>
 

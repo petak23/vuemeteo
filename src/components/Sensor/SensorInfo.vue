@@ -66,6 +66,9 @@ const sensorWarnMim = computed(() => {
 					<br>Grafy sa vykresľujú z hodinových alebo denných súčtov.
 				</small>
 			</p>
+			<p v-else-if="props.sensor.device_class == 4">
+				<b>4</b> - "Impulzné" dáta s počítaním konkrétnej hodnoty nie impulzov.
+			</p>
 		</div>
 	</div>
 

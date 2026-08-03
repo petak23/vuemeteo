@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch} from 'vue'
 import MainService from '../../services/MainService'
+import InfoMessage from '../PageComponents/InfoMessage.vue'
 
 const props = defineProps({
 	sensor: {
@@ -42,6 +43,11 @@ onMounted(() => {
 	else setError("Chybné id: [" + props.sensor.id + "] senzoru.(2)")
 })
 
+const toMaxDecimalPlaces = (value, places) => {
+	if (value == null) return null
+	const factor = Math.pow(10, places)
+	return Math.round(value * factor) / factor
+}
 /*
 const sensorName = computed(() => props.sensor.name || 'N/A')
 const sensorValue = computed(() => props.sensor.value || 0)
@@ -74,16 +80,12 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 		<span v-else>
 			Nie sú dostupné žiadne detailné dáta.
 		</span>
-
-		<p>
-			<i><small>
-				"Detailné dáta" sú primárne záznamy zo zariadenia. Sú uložené tak, ako prišli zo zariadenia. Pretože ich môže byť príliš veľa, 
-				nedrží sa všetky za celú históriu - urobia sa z nich sumárne záznamy (pre každú hodinu minimum a maximum vrátane času, kedy boli namerané)
-				a detailné dáta staršie ako nastavený čas sú vymazané. 
-				Posledných niekoľko mesiacov je tak pokryté detailnými dátami, staršie obdobie len sumárnymi.
-			</small></i>
-		</p>
-
+		<info-message>
+			"Detailné dáta" sú primárne záznamy zo zariadenia. Sú uložené tak, ako prišli zo zariadenia. Pretože ich môže byť príliš veľa, 
+			nedrží sa všetky za celú históriu - urobia sa z nich sumárne záznamy (pre každú hodinu minimum a maximum vrátane času, kedy boli namerané)
+			a detailné dáta staršie ako nastavený čas sú vymazané. 
+			Posledných niekoľko mesiacov je tak pokryté detailnými dátami, staršie obdobie len sumárnymi.
+		</info-message>
 	</div>
 	<div class="px-2 mb-3" v-if="sensorStats != null">
 
@@ -107,15 +109,12 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 		<span v-else>
 			Nie sú dostupné žiadne sumárne dáta.
 		</span>
-		<p>
-			<i><small>
-				Zo zaznamenaných hodnôt (detailných dát) sa automaticky počítajú sumárne dáta.
-				Pre bežné typy hodnôt (teplota, tlak,...) sa z každej hodiny uloží minimálna a maximálna hodnota (vrátane času, kedy v hodine bolo danej hodnoty dosiahnuté). 
-				Pre rýchlejšie vykreslenie dlhých grafov sa ďalej nájde aj denné maximum a minimum.
-				Pre impulzné meradlá (napríklad plynomer, zrážky) sa ako sumárne dáta počítajú súčty za hodinu a za deň.
-			</small></i>
-		</p>
-
+		<info-message>
+			Zo zaznamenaných hodnôt (detailných dát) sa automaticky počítajú sumárne dáta.
+			Pre bežné typy hodnôt (teplota, tlak,...) sa z každej hodiny uloží minimálna a maximálna hodnota (vrátane času, kedy v hodine bolo danej hodnoty dosiahnuté). 
+			Pre rýchlejšie vykreslenie dlhých grafov sa ďalej nájde aj denné maximum a minimum.
+			Pre impulzné meradlá (napríklad plynomer, zrážky) sa ako sumárne dáta počítajú súčty za hodinu a za deň.
+		</info-message>
 	</div>
 
 	<div class="px-2 mb-3" v-if="sensorStats != null && sensorStats.mesicniSumarizace != null">
@@ -160,9 +159,9 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 				<td><b>{{ rok }}</b></td>
 				<td>{{ props.sensor.unit}}</td>
 				<td class="text-right" v-for="i in 12" :key="i">
-					<div v-if="rokData[i] != undefined" class="text-danger py-0 my-0">{{ rokData[i].max }}</div>
-					<div v-if="rokData[i] != undefined" class="text-secondary py-0 my-0">{{ rokData[i].avg }}</div>
-					<div v-if="rokData[i] != undefined" class="text-primary py-0 my-0">{{ rokData[i].min }}</div>
+					<div v-if="rokData[i] != undefined" class="text-danger py-0 my-0">{{ toMaxDecimalPlaces(rokData[i].max, 2) }}</div>
+					<div v-if="rokData[i] != undefined" class="text-secondary py-0 my-0">{{ toMaxDecimalPlaces(rokData[i].avg, 2) }}</div>
+					<div v-if="rokData[i] != undefined" class="text-primary py-0 my-0">{{ toMaxDecimalPlaces(rokData[i].min, 2) }}</div>
 				</td>
 			</tr>
 		</table>

@@ -2,6 +2,10 @@
 import { computed, ref, onMounted } from 'vue';
 import ChartHeader from '../components/Chart/ChartHeader.vue';
 import MainService from '../services/MainService'
+import { RouterLink } from 'vue-router'
+import { useMainStore } from '../stores/main'
+const store = useMainStore()
+
 const props = defineProps({
 	id: { type: Number, default: 0 },
 	mode: { type: String, default: 'sensor' }
@@ -76,8 +80,18 @@ const options = {
 
 <template>
 	<div class="col-12">
-		<div class="pb-3 pt-3 px-2">
+		<div class="pb-3 pt-3 px-2 d-flex justify-content-between align-items-center">
 			<h1>Grafy</h1>
+			<div class="btn-group">
+				<RouterLink :to="'/device/' + store.actual_device_id" class="btn btn-outline-primary btn-sm">
+					Späť na zariadenie
+					<i class="ms-2 fa-solid fa-rotate-left"></i>
+				</RouterLink>
+				<RouterLink :to="'/sensor/' + store.actual_sensor_id" class="btn btn-outline-primary btn-sm">
+					Späť na senzor
+					<i class="ms-2 fa-solid fa-rotate-left"></i>
+				</RouterLink>
+			</div>
 		</div>
 		<ChartHeader 
 			:id="props.id"
