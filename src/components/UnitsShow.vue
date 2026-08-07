@@ -4,7 +4,8 @@ import MainService from '../services/MainService'
 
 
 const items = ref(null)
-const modal_view = ref(false)
+const modal_view_edit = ref(false)
+const modal_view_delete = ref(false)
 const unit_name = ref("")
 const active_unit_id = ref(0)
 
@@ -25,17 +26,38 @@ const getUnits = () => {
 
 const doEditModal = (id) => {
 	console.log(id)
-	modal_view.value = true
+	modal_view_edit.value = true
+	unit_name.value = items.value[id]
+	active_unit_id.value = id
+}
+const doDeleteModal = (id) => {
+	console.log(id)
+	modal_view_delete.value = true
 	unit_name.value = items.value[id]
 	active_unit_id.value = id
 }
 const hideModals = () => {
-	modal_view.value = false
+	modal_view_edit.value = false
+	modal_view_delete.value = false
 	unit_name.value = ""
 	active_unit_id.value = 0
 }
 const saveUnit = (id) => {
 	MainService.postSaveUnit(id, unit_name.value)
+		.then(response => {
+			if (response.data.status == 200 && response.data.units !== undefined) {
+				items.value = response.data.units
+				hideModals()
+			} else {
+				console.error(response.data.message)
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+}
+const deleteUnit = (id) => {
+	MainService.getDeleteUnit(id)
 		.then(response => {
 			if (response.data.status == 200 && response.data.units !== undefined) {
 				items.value = response.data.units
@@ -56,19 +78,36 @@ const saveUnit = (id) => {
 			<tr>
 				<th>Id</th>
 				<th>Meno</th>
-				<th><button class="btn btn-outline-secondary btn-sm">+ Pridaj</button></th>
+				<th>Popis</th>
+				<th>
+					<BButton
+						variant="outline-secondary"
+						size="sm" 
+						@click="doEditModal(0)"
+					>
+						+ Pridaj
+					</BButton>
+				</th>
 			</tr>
-			<tr v-for="(unit, id) in items" :key="id">
-				<td>{{ id }}</td>
-				<td>{{ unit }}</td>
+			<tr v-for="item in items" :key="item.id">
+				<td>{{ item.id }}</td>
+				<td>{{ item.unit }}</td>
 				<td>
 					<BButton
 						variant="link"
-						:title="'Edituj jednotku:' + unit"
-						class="btn-sm text-warning-emphasis" 
-						@click="doEditModal(id)"
+						:title="'Edituj jednotku:' + item.unit"
+						size="sm"
+						@click="doEditModal(item.id)"
 					>
-						<i class="fa-solid fa-pencil"></i>
+						<i class="fa-solid fa-pencil text-warning-emphasis"></i>
+					</BButton>
+					<BButton
+						variant="link"
+						:title="'Zmaž jednotku:' + item.unit"
+						size="sm" 
+						@click="doDeleteModal(item.id)"
+					>
+						<i class="fa-solid fa-trash text-danger"></i>
 					</BButton>
 				</td>
 			</tr>
@@ -76,7 +115,7 @@ const saveUnit = (id) => {
 	</table>
 	<div class="alert alert-warning" v-else>Žiadne jednotky ešte nie sú zadané.</div>
 	<BModal
-    v-model="modal_view"
+    v-model="modal_view_edit"
 		centered
 		body-bg-variant="primary"
 		body-text-variant="white"
@@ -98,6 +137,29 @@ const saveUnit = (id) => {
 				variant="outline-success" 
 				@click="saveUnit(active_unit_id)"
 			>Uložiť</BButton>
+		</template>
+	</BModal>
+	<BModal
+    v-model="modal_view_delete"
+		centered
+		body-bg-variant="danger"
+		body-text-variant="white"
+  >
+		<template #title>
+			Zmazanie jednotky:
+		</template>
+		<div class="text-center">
+			<div class="alert alert-warning" role="alert">
+				<b>Upozornenie:</b>
+				Naozaj chcete zmazať jednotku?
+			</div>
+		</div>
+		<template #footer>
+			<BButton variant="secondary" @click="hideModals">Zrušiť</BButton>
+			<BButton 
+				variant="outline-danger" 
+				@click="deleteUnit(active_unit_id)"
+			>Zmazať</BButton>
 		</template>
 	</BModal>
 </template>
