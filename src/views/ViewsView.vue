@@ -2,10 +2,16 @@
 import { ref, onMounted } from 'vue'
 import ViewsSimpleList from '../components/Views/ViewsSimpleList.vue';
 import ViewsDetailList from '../components/Views/ViewsDetailList.vue';
+import ViewEditForm from '../components/Views/ViewEditForm.vue';
 import MainService from '../services/MainService.js'
 
 const switchView = ref(false)
 const views = ref(null)
+
+const props = defineProps({
+	id: { type: Number, default: 0 },
+	mode: { type: String, default: 'view' }
+})
 
 onMounted(() => {
 	MainService.getViews()
@@ -24,14 +30,24 @@ onMounted(() => {
 
 <template>
 	<div class="row">
-		<div class="col-12">
-			<h1>Moje grafy</h1>
-			<button class="btn btn-secondary btn-sm me-2" @click="switchView = !switchView">
-				<strong>{{ switchView ? 'Jednoduchý' : 'Detailný' }}</strong> výpis grafov
+		<div class="col-12" v-if="props.mode === 'view'">
+			<h1>
+				Moje grafy
+				<small class="ms-2">(Aktuálne zobrazený je {{ !switchView ? 'jednoduchý' : 'detailný' }} výpis grafov)</small>
+			</h1>
+			Prepni na: 
+			<button class="btn btn-link m-0 p-0 mb-1" @click="switchView = !switchView">
+				<strong>{{ switchView ? 'Jednoduchý' : 'Detailný' }}</strong>
 			</button>
-			<button class="btn btn-secondary btn-sm" disabled type="button">
+			výpis grafov.
+			<button class="btn btn-secondary btn-sm mb-1" disabled type="button">
 				<strong>Nový graf</strong>
 			</button>
+		</div>
+		<div class="col-12" v-else-if="props.mode === 'edit'">
+			<h1>
+				Editácia grafu s ID: {{ props.id }}
+			</h1>
 		</div>
 		<div class="col-12">
 			<div class="row">
@@ -42,11 +58,23 @@ onMounted(() => {
 						</div>
 					</div>
 				</div>
-				<div class="col-12" v-else>
+				<div class="col-12" v-else-if="props.mode === 'view'">
 					<views-simple-list v-if="!switchView" :views="views" />
 					<views-detail-list v-else :views="views" />
+				</div>
+				<div class="col-12" v-else-if="props.mode === 'edit'">
+					<view-edit-form 
+						:view="views.views[props.id]"
+						:id="props.id"
+					/>
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
+
+<style>
+	h1 > small {
+		font-size: 0.5em;
+	}
+</style>

@@ -32,7 +32,7 @@ export const useMainStore = defineStore('main', () => {
 		{
 			only_logged_in: false,
 			to: '/units',
-			name: 'Jednotky',
+			name: 'Kódy jednotiek',
 			fa_icon: 'fa-thermometer',
 			children: null
 		},

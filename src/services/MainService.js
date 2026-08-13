@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-//const baseUrl = "http://localhost/apimeteo/"
-const baseUrl = "https://apimeteo.echo-msz.eu/"
+const baseUrl = "http://localhost/apimeteo/"
+//const baseUrl = "https://apimeteo.echo-msz.eu/"
 
 //console.log(window.location.origin)
 //const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "https://apimeteo.echo-msz.eu/" 
@@ -41,10 +41,10 @@ export default {
 		return apiClient.get('sensorstat/' + id)
 	},
 	getUnits() {
-		return apiClient.get('units')
+		return apiClient.get('units/default/1')
 	},
-	postSaveUnit(id, unit_name) {
-		return apiClient.post('unit/save/' + id, { unit: unit_name })
+	postSaveUnit(id, unit_data) {
+		return apiClient.post('unit/save/' + id, unit_data)
 	},
 	getDeleteUnit(id) {
 		return apiClient.get('unit/delete/' + id)

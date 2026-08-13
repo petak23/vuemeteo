@@ -1,4 +1,5 @@
 <script setup>
+import { RouterLink } from 'vue-router';
 const props = defineProps({
 	views: {
 		type: Object,
@@ -34,6 +35,9 @@ const props = defineProps({
 									{{ source.name }}
 								</li>
 							</ul>
+							<RouterLink :to="`/view/edit/${view.id}`" class="btn btn-sm btn-outline-primary">
+								<i class="fa-solid fa-pen me-1"></i>Upraviť
+							</RouterLink>
 						</td>
 					</tr>
 				</tbody>
