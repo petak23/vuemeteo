@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, onMounted, watch } from 'vue'
+import { computed, reactive, ref, onMounted, watch } from 'vue'
 
 // Nette's Form::addProtection() adds a hidden CSRF token field rendered
 // server-side. In a decoupled Vue app there is no such field to render;
@@ -79,53 +79,61 @@ const valid = reactive({
 	vorder: null,
 })
 
+const validForm = ref(false)
+
 const submitting = ref(false)
 
 function clearErrors() {
 	Object.keys(errors).forEach((key) => (errors[key] = ''))
 }
 
-function validate() {
-	clearErrors()
-	let valid = true
+const validate = computed(() => {
+	/*clearErrors()
 	validateName()
-	if (!valid.name) {
-		valid = false
-	}
-	if (!form.app_name.trim()) {
-		errors.app_name = 'Toto pole je povinné.'
-		valid = false
-	}
-	if (!form.vdesc.trim()) {
-		errors.vdesc = 'Toto pole je povinné.'
-		valid = false
-	}
+	validateAppName()
 	validateToken()
-	if (!valid.token) {
-		valid = false
-	} 
-	if (!form.render) {
-		errors.render = 'Toto pole je povinné.'
-		valid = false
-	}
-	if (form.vorder === null || form.vorder === '' || Number.isNaN(form.vorder)) {
-		errors.vorder = 'Toto pole je povinné.'
-		valid = false
-	}
+	validateRender()
+	validateVorder()*/
 
-	return valid
-}
+	validForm.value = !Object.values(valid).some((value) => value === false)
+	return validForm.value 
+})
+
+/*const validate = () => {
+	clearErrors()
+	validateName()
+	validateAppName()
+	validateToken()
+	validateRender()
+	validateVorder()
+
+	validForm.value = !Object.values(valid).some((value) => value === false)
+	return validForm.value
+}*/
 
 const validateName = () => {
 	if (!form.name.trim()) {
 		errors.name = 'Toto pole je povinné a musí byť vyplnené.'
-		valid = false
+		valid.name = false
+	} else {
+		errors.name = ''
+		valid.name = true
+	}
+}
+
+const validateAppName = () => {
+	if (!form.app_name.trim()) {
+		errors.app_name = 'Toto pole je povinné a musí byť vyplnené.'
+		valid.app_name = false
+	} else {
+		errors.app_name = ''
+		valid.app_name = true
 	}
 }
 
 const validateToken = () => {
 	if (!form.token.trim()) {
-		errors.token = 'Toto pole je povinné.'
+		errors.token = 'Toto pole je povinné a musí byť vyplnené.'
 		valid.token = false
 	} else if (!/^[0-9A-Za-z-]+$/.test(form.token)) {
 		errors.token = 'Len písmena, čísla a pomlčka'
@@ -136,12 +144,44 @@ const validateToken = () => {
 	}
 }
 
+const validateRender = () => {
+	if (!form.render.length) {
+		errors.render = 'Toto pole je povinné. Musíte vybrať nejakú možnosť.'
+		valid.render = false
+	} else {
+		errors.render = ''
+		valid.render = true
+	}
+}
+
+const validateVorder = () => {
+	if (form.vorder === null || form.vorder === '' || Number.isNaN(form.vorder)) {
+		errors.vorder = 'Toto pole je povinné a musíte zadať číslo väčšie ako 0.'
+		valid.vorder = false
+	} else {
+		errors.vorder = ''
+		valid.vorder = true
+	}
+}
+
 watch(() => form.token, () => {
 	validateToken()
 })
 
 watch(() => form.name, () => {
 	validateName()
+})
+
+watch(() => form.app_name, () => {
+	validateAppName()
+})
+
+watch(() => form.render, () => {
+	validateRender()
+})
+
+watch(() => form.vorder, () => {
+	validateVorder()
 })
 
 async function handleSubmit() {
@@ -189,7 +229,7 @@ onMounted(() => {
 		form.vorder = props.view.vorder
 	}
 })
-watch(() => props.view, (newValue, oldValue) => {
+watch(() => props.view, () => {
 	if (props.id > 0) {
 		form.name = props.view.name
 		form.app_name = props.view.app_name
@@ -234,9 +274,11 @@ watch(() => props.view, (newValue, oldValue) => {
 				size="50"
 				required
 				class="form-control"
+				@blur="validateAppName"
+				:class="classType(valid.app_name)"
 			/>
-			<div class="form-text">Bude zobrazené v šedom pruhu hore.</div>
 			<div v-if="errors.app_name" class="invalid-feedback">{{ errors.app_name }}</div>
+			<div class="form-text">Bude zobrazené v šedom pruhu hore.</div>
 		</div>
 
 		<!-- vdesc -->
@@ -293,7 +335,14 @@ watch(() => props.view, (newValue, oldValue) => {
 		<!-- render -->
 		<div class="form-group">
 			<label for="render" class="form-label">Vykreslovací stroj:</label>
-			<select id="render" v-model="form.render" required class="form-select">
+			<select 
+				id="render" 
+				v-model="form.render" 
+				required
+				class="form-select"
+				@blur="validateRender"
+				:class="classType(valid.render)"
+			>
 				<option value="" disabled>- Zvolte spôsob vykreslenia -</option>
 				<option
 					v-for="(label, value) in renders"
@@ -318,19 +367,19 @@ watch(() => props.view, (newValue, oldValue) => {
 				class="form-control"
 				aria-describedby="vorderHelpBlock"
 			/>
+			<div v-if="errors.vorder" class="invalid-feedback">{{ errors.vorder }}</div>
 			<div id="vorderHelpBlock" class="form-text">
 				Poradie v menu - ak je viac grafov s rovnakým tokenom, radia sa podľa
 				tejto hodnoty. Vyššie číslo = viac hore.
 			</div>
-			<div v-if="errors.vorder" class="invalid-feedback">{{ errors.vorder }}</div>
 		</div>
 
 		<!-- submit -->
 		<div class="form-group">
-			<button class="btn btn-outline-success" type="submit" :disabled="submitting">
+			<button class="btn btn-success" type="submit" :disabled="!validForm || submitting">
 				{{ submitting ? 'Ukládám…' : 'Uložit' }}
 			</button>
-			<button class="btn btn-outline-secondary" type="submit">
+			<button class="btn btn-outline-secondary ms-2" type="submit">
 				Zruš
 			</button>
 		</div>
