@@ -28,7 +28,7 @@ const randomCode = ref(Math.random().toString(36).slice(2, 7))
 
 <style scoped>
 	p.description {
-		font-size: 70%;
+		font-size: 85%;
 		line-height: 1.2em;
 		font-style: italic;
 	}

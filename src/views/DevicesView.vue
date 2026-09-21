@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from "vue"
 import DevicesInfo from '../components/Devices/DevicesInfo.vue'
 
 import { useMainStore } from '../stores/main'
@@ -8,10 +7,6 @@ const store = useMainStore()
 const props = defineProps({
 	edit: { type: Boolean, default: false},
 })
-
-
-
-const error = ref(null)
 </script>
 
 <template>
@@ -24,12 +19,10 @@ const error = ref(null)
 			</RouterLink>
 		</div>
 		<div class="col-12 mt-2">
-			<devices-info 
-				@error="error = $event"	
-			/>
-			<div v-if="error != null" class="alert alert-danger mt-2" role="alert">
-				<h4 class="alert-heading">Chyba: {{ error.status }}</h4>
-				<p>{{ error.message }}</p>
+			<devices-info v-if="store.devices != null"/>
+			<div class="alert alert-warning" v-else>
+				<b>Zatiaľ neexistuje žiadne zariadenie!</b><br />
+				Prosím, pridajte nejaké.
 			</div>
 		</div>
 	</div>

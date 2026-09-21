@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { watch,onMounted } from 'vue'
 import MainService from '../services/MainService'
 
 import { useMainStore } from '../stores/main'
@@ -37,6 +37,12 @@ const getActualUser = async () => {
 			console.error(error)
 		})
 }
+
+watch(() => store.user, () => {
+	if (store.user !== null) {
+		store.getDevices()
+	}
+})
 
 onMounted(() => {
 	getMySettings()

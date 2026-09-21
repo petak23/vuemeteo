@@ -53,13 +53,16 @@ const props = defineProps({
 				<div class="col-1">
 					<Device_popover
 						:click_me="true"
-						:text_to_target="'#' + sensor.device_class"
-						:text="sensor.dc_desc"
+						:text_to_target="'#' + sensor.id_sensor_classes"
+						:text="sensor.sensor_class"
 					/>
 				</div>
 				<div class="col-6 col-md-1">
 					<span v-if="sensor.preprocess_data == 1">
 						x {{ sensor.preprocess_factor }}
+					</span>
+					<span v-else>
+						---
 					</span>
 				</div>
 				<div class="col-6 col-md-2">{{ sensor.msg_rate }}, {{ sensor.display_nodata_interval }}</div>
