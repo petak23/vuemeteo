@@ -5,11 +5,15 @@ import { useMainStore } from '../../stores/main'
 const store = useMainStore()
 const route = useRoute()
 const props = defineProps({
+	id: {
+		type: Number,
+		required: true
+	},
 	to: {
 		type: String,
 		required: true,
 	},
-	faIcon: {
+	fa_icon: {
 		type: String,
 		default: ''
 	},
@@ -20,10 +24,6 @@ const props = defineProps({
 	children: {
 		type: Object,
 		default: null
-	},
-	to_main: {
-		type: String,
-		default: ""
 	}
 })
 
@@ -32,20 +32,18 @@ const childrenCount = computed(() => {
 })
 
 const isActiveLink = computed(() => {
-	const linkPath = props.to_main + props.to
-	return route.path === linkPath || route.path.startsWith(linkPath + '/')
+	return route.path === props.to
 })
 
 const viewSubmenu = computed(() => {
-	if (props.to_main == "/device/") {
-		return props.children != null && (store.actual_device_id == props.to || isActiveLink.value)
-	} else if (props.to_main == "/sensor/") {
-		return props.children != null && (store.actual_sensor_id == props.to || isActiveLink.value)
-	} else if (props.to_main == "" && (props.to != "/devices" || store.actual_device_id == null)) {
-		return false
-	} else {
-		return props.children != null || isActiveLink.value
+	if (props.to == "/devices" && props.children != null && route.path.startsWith("/devices")) {
+		return true
+	}	else if (props.to.startsWith("/device/")) {	
+		return props.children != null && store.actual_device_id == props.id
+	} else if (route.path.startsWith("/device/") || route.path.startsWith("/sensor/")) {
+		return true
 	}
+	return false
 })
 </script>
 
@@ -53,12 +51,12 @@ const viewSubmenu = computed(() => {
 	<li class="nav-item">
 		<RouterLink 
 			class="nav-link"
-			:to="props.to_main + props.to"
+			:to="props.to"
 			active-class="active"
 		>
 			<i 
 				class="fa-solid me-1"
-				:class="props.faIcon"
+				:class="props.fa_icon"
 			></i>
 			{{ props.text }} {{ childrenCount }}
 		</RouterLink>
@@ -66,11 +64,11 @@ const viewSubmenu = computed(() => {
 			<main-menu-item
 				v-for="(item, index) in props.children"
 				:key="index"
-				:to="String(item.id)"
-				fa-icon="fa-hard-drive"
+				:to="item.to"
+				:fa_icon="item.fa_icon"
 				:text="item.name"
-				:children="item.sensors"
-				:to_main="item.passphrase != undefined ? '/device/' : '/sensor/'"
+				:children="item.children"
+				:id="item.id"
 			/>
 		</ul>
 	</li>

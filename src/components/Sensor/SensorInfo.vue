@@ -15,7 +15,7 @@ const sensorWarnMax = computed(() => {
 
 const sensorWarnMim = computed(() => {
 	return props.sensor.warn_min == 1 ?
-					"Pre &gt;= <b>" + props.sensor.warn_min_val+"</b> "+props.sensor.unit+" zasielame text: '<b>"+props.sensor.warn_min_text+"</b>'"
+					"Pre &lt;= <b>" + props.sensor.warn_min_val+"</b> "+props.sensor.unit+" zasielame text: '<b>"+props.sensor.warn_min_text+"</b>'"
 					+ (props.sensor.warn_min_after > 0 ? " po <b>"+props.sensor.warn_min_after+"</b> sekundách" : "")
 					: "-" 
 })

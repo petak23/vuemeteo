@@ -173,7 +173,7 @@ const handleDelete = (id) => {
 			</div>
 		</div>
 
-		<div class="card mb-4" v-if="formData.device_class == 1 || formData.device_class == 2">
+		<div class="card mb-4" v-if="props.sensor.id_sensor_classes == 1 || props.sensor.id_sensor_classes == 2">
 			<div class="card-header">
 				<h5 class="mb-0">Poplach pri vysokej hodnote</h5>
 			</div>
@@ -184,6 +184,7 @@ const handleDelete = (id) => {
 						v-model="formData.warn_max"
 						type="checkbox"
 						class="form-check-input"
+						:checked="formData.warn_max"
 					/>
 					<label for="warn_max" class="form-check-label">
 						Zapnúť zasielanie
@@ -242,13 +243,15 @@ const handleDelete = (id) => {
 							maxlength="50"
 							class="form-control"
 						/>
-						<small class="form-text text-muted d-block">Tento text bude súčasťou varovania. (Maximálne 50 znakov)</small>
+						<small class="form-text text-muted d-block">
+							Tento text bude súčasťou varovania. ({{ formData.warn_max_text ? formData.warn_max_text.length : 0 }} z max. 50 znakov)
+						</small>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="card mb-4" v-if="formData.device_class == 1 || formData.device_class == 2">
+		<div class="card mb-4" v-if="props.sensor.id_sensor_classes == 1 || props.sensor.id_sensor_classes == 2">
 			<div class="card-header">
 				<h5 class="mb-0">Poplach pri nízkej hodnote</h5>
 			</div>
@@ -314,9 +317,10 @@ const handleDelete = (id) => {
 							type="text"
 							maxlength="50"
 							class="form-control"
-							placeholder="Nepovinné"
 						/>
-						<small class="form-text text-muted d-block">Tento text bude súčasťou varovania. (Maximálne 50 znakov)</small>
+						<small class="form-text text-muted d-block">
+							Tento text bude súčasťou varovania. ({{ formData.warn_min_text ? formData.warn_min_text.length : 0 }} z max. 50 znakov)
+						</small>
 					</div>
 				</div>
 			</div>

@@ -26,7 +26,7 @@ const route = useRoute()
 console.log(route.query) // Access param
 
 const updateLink = (val) => {
-	console.log(val);
+	// console.log(val);
 	
 	chartParams.value.dateFrom = val.dateFrom
 	chartParams.value.lenDays = val.lenDays
@@ -103,9 +103,9 @@ const options = {
 			@update:link="updateLink"
 			@update:alt-year="updateLink"
 		/>
-		<div class="alert alert-warning" role="alert">
+		<!--div class="alert alert-warning" role="alert">
 			Current: {{ chartParams.current }}, Minus: {{ chartParams.minus }}, Plus: {{ chartParams.plus }}
-		</div>
+		</div-->
 		<div>
 			<img :src="imglink" alt="Placeholder Chart" class="img-fluid" />
 		</div>

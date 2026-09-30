@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-//const baseUrl = "http://localhost/apimeteo/"
-const baseUrl = "https://apimeteo.echo-msz.eu/"
+const baseUrl = "http://localhost/apimeteo/"
+//const baseUrl = "https://apimeteo.echo-msz.eu/"
 
 //console.log(window.location.origin)
 //const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "https://apimeteo.echo-msz.eu/" 

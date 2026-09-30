@@ -64,7 +64,36 @@ export const useMainStore = defineStore('main', () => {
 	const actual_sensor_id = ref(null) // ID práve zobrazeného senzora
 
 	const addDevicesToMenu = () => {
-		main_menu.value[3].children = devices.value
+		if (devices.value !== null) {
+			console.log("Adding devices to menu...")
+			console.log(devices.value)
+			main_menu.value[3].children = []
+			for (const device of Object.values(devices.value)) {
+				if (device.sensors !== null) {
+					device.children = []
+					for (const sensor of Object.values(device.sensors)) {
+						device.children.push({
+							id: sensor.id,
+							only_logged_in: true,
+							to: '/sensor/' + sensor.id,
+							name: sensor.name,
+							fa_icon: null,
+							children: null
+						})
+					}
+				} else {
+					device.children = null
+				}
+				main_menu.value[3].children.push({
+					id: device.id,
+					only_logged_in: true,
+					to: '/device/' + device.id,
+					name: device.name,
+					fa_icon: null,
+					children: device.children
+				})
+			}
+		}
 	}
 
 	const setActualDeviceId = (id, ids = null) => {

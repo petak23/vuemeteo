@@ -83,7 +83,7 @@ onMounted(()=> {
 })
 
 const h1_text = computed(() => {
-	return mode_edit.value == 2 ? 'Pridanie zariadenia' : ((mode_edit.value == 1 ? 'Editácia zariadenia' : 'Info o zariadení') + ":" + (device_one.value != null ? device_one.value.name : ''))
+	return mode_edit.value == 2 ? 'Pridanie zariadenia' : ((mode_edit.value == 1 ? 'Editácia zariadenia' : 'Info o zariadení') + ": " + (device_one.value != null ? device_one.value.name : ''))
 })
 </script>
 

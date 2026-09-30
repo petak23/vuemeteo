@@ -19,9 +19,10 @@ const filteredMenu = computed(() =>
 			v-for="item in filteredMenu"
 			:key="item.to"
 			:to="String(item.to)"
-			:fa-icon="item.fa_icon"
+			:fa_icon="item.fa_icon"
 			:text="item.name"
 			:children="item.children"
+			:id="0"
 		 />
 	</ul>
 </template>

@@ -65,10 +65,10 @@ const uptimeReadable = computed(() => {
 						<i>Túto konfiguráciu nastavte v zariadení.</i>
 					</div>
 				</div>
-				<div class="row px-2 bg-secondary-subtle">
+				<!--div class="row px-2 bg-secondary-subtle">
 					<div class="col-12 col-md-3">RA URL:</div>
 					<div class="col-12 col-md-9"><b>{{ item.url }}</b></div>
-				</div>
+				</div-->
 				<div class="row px-2 bg-light-subtle">
 					<div class="col-12 col-md-3">RA device name:</div>
 					<div class="col-12 col-md-9"><b>{{ item.name }}</b></div>
