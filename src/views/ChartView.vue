@@ -44,8 +44,10 @@ onMounted(() => {
 	MainService.getChartSensor(props.id, chartParams.value)
 	.then(response => {
 		console.log(response.data);
-		if (response.data.status == 200)
+		if (response.data.status == 200) {
 			chartData.value = response.data
+			store.setActualDeviceId(response.data.sensor.device_id, response.data.sensor.id)
+		}
 	})
 	.catch((error) => {
 		console.log(error);

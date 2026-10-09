@@ -74,7 +74,7 @@ onMounted(() => {
 	if (props.logOut) {
 		MainService.getLogOut()
 		.then(response => {
-			console.log(response.data);
+			//console.log(response.data);
 			store.token = null
 			store.user = null
 			// Optionally, redirect to another page or update UI

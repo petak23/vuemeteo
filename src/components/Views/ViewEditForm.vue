@@ -165,6 +165,7 @@ const validateVorder = () => {
 }
 
 watch(() => form.token, () => {
+	console.log('Token changed:', form.token)
 	validateToken()
 })
 
@@ -185,10 +186,11 @@ watch(() => form.vorder, () => {
 })
 
 async function handleSubmit() {
-	if (!validate()) return
+	if (!validate) return
 
 	submitting.value = true
 	try {
+		// TODO ukladanie cez API
 		const response = await fetch('/api/view-form', {
 			method: 'POST',
 			headers: {
@@ -227,6 +229,10 @@ onMounted(() => {
 		form.allow_compare = props.view.allow_compare
 		form.render = props.view.render
 		form.vorder = props.view.vorder
+	} else {
+		validateToken()
+		validateRender()
+		validateVorder()
 	}
 })
 watch(() => props.view, () => {
@@ -376,7 +382,7 @@ watch(() => props.view, () => {
 
 		<!-- submit -->
 		<div class="form-group">
-			<button class="btn btn-success" type="submit" :disabled="!validForm || submitting">
+			<button class="btn btn-success" type="submit" :disabled="(!validForm) || submitting">
 				{{ submitting ? 'Ukládám…' : 'Uložit' }}
 			</button>
 			<button class="btn btn-outline-secondary ms-2" type="submit">

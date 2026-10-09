@@ -40,13 +40,13 @@ onMounted(() => {
 				<strong>{{ switchView ? 'Jednoduchý' : 'Detailný' }}</strong>
 			</button>
 			výpis grafov.
-			<button class="btn btn-secondary btn-sm mb-1" disabled type="button">
+			<RouterLink class="btn btn-secondary btn-sm mb-1" to="/view/new" type="button">
 				<strong>Nový graf</strong>
-			</button>
+			</RouterLink>
 		</div>
 		<div class="col-12" v-else-if="props.mode === 'edit'">
 			<h1>
-				Editácia grafu s ID: {{ props.id }}
+				{{ props.id === 0 ? 'Pridanie nového grafu' : 'Editácia grafu s ID: ' + props.id }}
 			</h1>
 		</div>
 		<div class="col-12">
@@ -67,6 +67,11 @@ onMounted(() => {
 						:view="views.views[props.id]"
 						:id="props.id"
 					/>
+				</div>
+				<div class="col-12" v-if="views == null || views.views.length == 0">
+					<div class="alert alert-warning" role="alert">
+						<strong>Upozornenie:</strong> Zatiaľ neexistujú žiadne grafy.
+					</div>
 				</div>
 			</div>
 		</div>

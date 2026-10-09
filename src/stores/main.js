@@ -4,10 +4,6 @@ import MainService from '../services/MainService'
 
 export const useMainStore = defineStore('main', () => {
 
-	const baseUrl = ref(document.getElementById('app').dataset.baseUrl)
-
-	const apiPath = computed(() => baseUrl.value + "api/") // Cesta k API
-
 	const appName = ref("")  // Meno aplikácie
 
 	const links = ref([]) // Pole odkazov
@@ -18,6 +14,7 @@ export const useMainStore = defineStore('main', () => {
 
 	const user = ref(null)
 	const user_permission = ref(null)
+	const is_logged_in = computed(() => user.value !== null)
 
 	const token = ref(null)
 
@@ -149,15 +146,14 @@ export const useMainStore = defineStore('main', () => {
 	}
 
 	const getDevices = () => {
-		MainService.getDevices()
+		MainService.getDevices(is_logged_in.value)
 			.then(response => {
 				if (response.data.status == 200) {
 					devices.value = response.data.data
-					addDevicesToMenu()
+					if (is_logged_in.value) addDevicesToMenu()
 				}
 				else {
 					devices.value = null
-					// emit('error', response.data)
 					console.error(response.data.message)
 				}
 			})
@@ -166,9 +162,8 @@ export const useMainStore = defineStore('main', () => {
 			});
 	}
 
-
 	return { 
-		baseUrl, apiPath, appName, links, dataRetentionDays, minYear, user, token, 
+		appName, links, dataRetentionDays, minYear, user, is_logged_in, token, 
 		main_menu, 
 		devices, addDevicesToMenu, setActualDeviceId, resetActualDeviceId, actual_device_id, actual_sensor_id,
 		checkUserPermission, getActualUser, user_permission,

@@ -90,6 +90,12 @@ const router = createRouter({
 			component: () => import('../views/ViewsView.vue')
 		},
 		{
+			path: '/view/new',
+			name: 'Graf - nový',
+			component: () => import('../views/ViewsView.vue'),
+			props: route => ({ id: 0, mode: 'edit' }),
+		},
+		{
 			path: '/view/edit/:id',
 			name: 'Graf - editácia',
 			component: () => import('../views/ViewsView.vue'),

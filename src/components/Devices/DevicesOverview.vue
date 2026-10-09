@@ -1,42 +1,18 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import MainService from '../../services/MainService'
 import dayjs from 'dayjs'; //https://day.js.org/docs/en/display/format
 
-const items = ref(null)
+import { useMainStore } from '../../stores/main.js'
+const store = useMainStore()
 
 const format_date = (value) => {
 	const date = dayjs(value);
 	// Then specify how you want your dates to be formatted
 	return date.format('D.M.YYYY HH:mm:ss');
 }
-
-const emit = defineEmits(['error'])
-
-const getDevices = () => {
-	MainService.getDevices()
-		.then(response => {
-			if (response.data.status == 200) {
-				items.value = response.data.data
-			}
-			else {
-				items.value = null
-				emit('error', response.data)
-				//console.error(response.data.message)
-			}
-		})
-		.catch((error) => {
-			console.log(error);
-		})
-}
-
-onMounted(()=> {
-	getDevices();
-})
 </script>
 
-<template v-if="items != null">
-	<div v-for="item in items" :key="item.id" class="col">
+<template v-if="store.devices != null">
+	<div v-for="item in store.devices" :key="item.id" class="col">
 		<div class="card h-100 bg-light-subtle border-warning">
 			<h5 class="card-header">
 				{{ item.name }}
@@ -55,13 +31,15 @@ onMounted(()=> {
 						v-for="sen in item.sensors"
 						:key="sen.id"
 						class="list-group-item"
-					><small>
-						{{ sen.name }}( {{ format_date(sen.last_data_time) }} ) {{ sen.last_out_value.toFixed(2) }} {{ sen.value_unit }}
+					>
+						<small>
+							{{ sen.name }} ( {{ format_date(sen.last_data_time) }} ) {{ sen.last_out_value.toFixed(2) }} {{ sen.value_unit }}
+							<br /><span class="text-muted fs-7">{{ sen.desc }}</span>
 						</small>
 					</li>
 				</ul>
 			</div>
-			<div class="card-footer">
+			<div class="card-footer" v-if="store.is_logged_in">
 				<div class="d-flex justify-content-end pt-2">
 					<RouterLink :to="'device/' + item.id" class="btn btn-outline-secondary">
 						Viac info <i class="fa-solid fa-angles-right"></i>
@@ -71,3 +49,8 @@ onMounted(()=> {
 		</div>
 	</div>
 </template>
+
+<style lang="sass" scoped>
+	.fs-7
+		font-size: 0.8rem
+</style>

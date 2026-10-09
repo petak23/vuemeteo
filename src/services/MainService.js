@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-const baseUrl = "http://localhost/apimeteo/"
-//const baseUrl = "https://apimeteo.echo-msz.eu/"
+//const baseUrl = "http://localhost/apimeteo/"
+const baseUrl = "https://apimeteo.echo-msz.eu/"
 
 //console.log(window.location.origin)
 //const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "https://apimeteo.echo-msz.eu/" 
@@ -28,8 +28,8 @@ export default {
 	getMySettings() {
 		return apiClient.get('homepage/myappsettings')
 	},
-	getDevices() {
-		return apiClient.get('devices')
+	getDevices(is_logged_in) {
+		return apiClient.get(is_logged_in ? 'devices' : 'devices/deviceone')
 	},
 	getDevice(id_device) {
 		return apiClient.get('device/' + id_device)

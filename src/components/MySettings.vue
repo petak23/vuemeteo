@@ -38,19 +38,15 @@ const getActualUser = async () => {
 		})
 }
 
+// Sleduj stav užívateľa a vždy pri zmene jeho stavu konaj
 watch(() => store.user, () => {
-	if (store.user !== null) {
-		store.getDevices()
-	}
+	store.getDevices()
 })
 
 onMounted(() => {
 	getMySettings()
 	getActualUser()
-	if (store.user !== null) {
-		store.getDevices()
-	}
-	
+	store.getDevices()
 })
 </script>
 
