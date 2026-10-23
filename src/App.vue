@@ -52,7 +52,7 @@ const store = useMainStore()
 				<main-menu />
 			</div>
 			<div class="col-12 col-sm-8 pb-2"
-					:class="store.user != null ? 'col-lg-9 col-xl-10' : 'col-md-6 col-lg-4'"
+					:class="store.user != null ? 'col-lg-9 col-xl-10' : 'col-md-6 col-lg-8'"
 			> 
 				<RouterView />
 			</div>
