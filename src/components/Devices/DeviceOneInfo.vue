@@ -2,6 +2,7 @@
 import { onMounted, ref, watch, computed } from 'vue'
 import SensorTab from './SensorTab.vue'
 import DeviceSendConfig from './DeviceSendConfig.vue'
+import DeviceSendUpdate from './DeviceSendUpdate.vue'
 
 const props = defineProps({
 	device_item: { 
@@ -11,6 +12,8 @@ const props = defineProps({
 
 const item = ref({id: 0, name: 'none'})
 const viewConfigModal = ref(false)
+const viewUpdateModal = ref(false)
+const updateForm = ref(null)
 
 onMounted(()=> {
 	//console.log(props)
@@ -49,6 +52,16 @@ const uptimeReadable = computed(() => {
 	if (seconds || parts.length === 0) parts.push(`${seconds}sec`)
 	return parts.join(' ')
 })
+
+async function sendUpdate() {
+  const sent = await updateForm.value?.submit()
+  if (sent) viewUpdateModal.value = false
+}
+
+const emits = defineEmits(['update'])
+const handleUpdate = () => {
+	emits('update')
+}
 </script>
 
 <template>
@@ -128,9 +141,18 @@ const uptimeReadable = computed(() => {
 	<div class="col-12 col-md-2 bg-light-subtle">Kontrolovať v monitoringu:</div>
 	<div class="col-12 col-md-10 bg-light-subtle">{{ item.monitoring ==1 ? 'áno' : 'ne' }}</div>
 
+
+
 	<h3 class="border-top pt-2 mt-1 d-flex justify-content-between">
 		OTA aktualizácia aplikácie
-		<a href="Device:update $device['id']" class="disabled btn btn-outline-primary btn-sm me-1" role="button" disabled>Poslať OTA aktualizáciu aplikácie</a>
+		<!-- <a href="Device:update $device['id']" class="disabled btn btn-outline-primary btn-sm me-1" role="button" disabled>Poslať OTA aktualizáciu aplikácie</a> -->
+		<BButton 
+			@click="viewUpdateModal = true" title="Poslať OTA aktualizáciu aplikácie"
+			variant="outline-primary"
+			class="btn-sm me-1"
+		>
+			<i class="fa-solid fa-cloud-arrow-down"></i><span class="d-none d-sm-inline ms-2">Poslať OTA aktualizáciu aplikácie</span>
+		</BButton>
 	</h3>
 	
 	<div class="col-12" v-if="item.updates">
@@ -142,16 +164,36 @@ const uptimeReadable = computed(() => {
 				<div class="col   col-md-1">&nbsp;</div>
 		</div>
 		<div v-for="(upd, index) in item.updates" :key="upd.id" class="row" :class="index % 2 ? 'bg-light-subtle': 'bg-secondary-subtle'">
-				<div class="col   col-md-1">{$update['id']}</div>
-				<div class="col-6 col-md-3">{$update['fromVersion']}</div>
-				<div class="col-6 col-md-3">{$update['inserted']}</div>
-				<div class="col-6 col-md-3">{$update['downloaded']}</div><!-- TODO odkazy -->
-				<div class="col   col-md-1"><a href="Device:deleteupdate $device['id'], $update['id']">Zmazať</a></div>
+				<div class="col   col-md-1">{{upd.id}}</div>
+				<div class="col-6 col-md-3">{{upd.fromVersion}}</div>
+				<div class="col-6 col-md-3">{{upd.inserted}}</div>
+				<div class="col-6 col-md-3">{{upd.downloaded}}</div>
+				<div class="col   col-md-1">
+					<a href="Device:deleteupdate $device['id'], $update['id']" title="Zmazať">
+						<i class="fa-solid fa-trash text-danger-emphasis"></i>
+					</a></div><!-- TODO odkazy -->
 		</div>
 	</div>
 
 	<div class="col-12" v-else>Aktualizácie ešte neexistujú.</div>
 	
+	<BModal
+		v-model="viewUpdateModal"
+		:title="'Poslať update pre zariadenie ' + item.name"
+		centered
+		class="modal-xl"
+	>
+		<device-send-update :item="item" ref="updateForm" @update="handleUpdate"/>
+
+		<template #footer>
+			<BButton variant="secondary" @click="viewUpdateModal = false">
+				Zrušiť
+			</BButton>
+			<BButton variant="primary" @click="sendUpdate">
+				Odoslať
+			</BButton>
+		</template>
+	</BModal>
 
 	<div class="col-12 border-top mt-1 pt-2">
 		<h3 class="d-flex justify-content-between">

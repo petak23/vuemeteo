@@ -62,8 +62,8 @@ export const useMainStore = defineStore('main', () => {
 
 	const addDevicesToMenu = () => {
 		if (devices.value !== null) {
-			console.log("Adding devices to menu...")
-			console.log(devices.value)
+			//console.log("Adding devices to menu...")
+			//console.log(devices.value)
 			main_menu.value[3].children = []
 			for (const device of Object.values(devices.value)) {
 				if (device.sensors !== null) {

@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, toRaw } from 'vue'
-import dayjs from 'dayjs'; //https://day.js.org/docs/en/display/format
+import { toRaw } from 'vue'
+//import dayjs from 'dayjs'; //https://day.js.org/docs/en/display/format
 import DevicesSpec from './DevicesSpec.vue'
 import {
   Chart as ChartJS,
@@ -38,14 +38,14 @@ const props = defineProps({
 	}
 })
 
-const format_date = (value) => {
+/*const format_date = (value) => {
 	const date = dayjs(value);
 	// Then specify how you want your dates to be formatted
 	return date.format('D.M.YYYY HH:mm:ss');
-}
+}*/
 
 const export_data = (records, name) => {
-	
+	//console.log(props.device.id, records, name)
 	const reversed = [...records].reverse() // kópia poľa, originál sa nezmení
 	const labels = reversed.map(r => r.rec_hour)
 	const datasets = {
@@ -83,7 +83,11 @@ const export_data = (records, name) => {
 				>
 					{{ sen.desc }} [<span class="text-muted fs-7">{{ sen.name }}</span>] ( {{ sen.last_data_time }} ): <strong>{{ sen.last_out_value.toFixed(2) }} {{ sen.value_unit }}</strong>
 					
-					<Line :data="export_data(toRaw(sen.sumdata), sen.desc)" :options="options" class="sensor-chart"/>
+					<Line
+					 	v-if="props.device.id == 1" 
+						:data="export_data(toRaw(sen.sumdata), sen.desc)"
+						:options="options"
+						class="sensor-chart"/>
 				</li>
 			</ul>
 			<DevicesSpec v-if="props.device.id == 1 && Object.keys(props.device.sensors).length" :sensors="props.device.sensors" 

@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-//const baseUrl = "http://localhost/apimeteo/"
-const baseUrl = "https://apimeteo.echo-msz.eu/"
+const baseUrl = "http://localhost/apimeteo/"
+//const baseUrl = "https://apimeteo.echo-msz.eu/"
 
 //console.log(window.location.origin)
 //const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "https://apimeteo.echo-msz.eu/" 
@@ -14,8 +14,7 @@ const apiClient = axios.create({
 	baseURL: baseUrl,
 	withCredentials: true, //false, // This is the default
 	headers: {
-		Accept: 'application/json',
-		'Content-Type': 'application/json'
+		Accept: 'application/json'
 	},
 	timeout: 10000
 })
@@ -33,6 +32,9 @@ export default {
 	},
 	getDevice(id_device) {
 		return apiClient.get('device/' + id_device)
+	},
+	postDeviceUpdate(id_device, data) {
+		return apiClient.post('device/' + id_device + '/update', data)
 	},
 	getSensor(id) {	
 		return apiClient.get('sensor/' + id)

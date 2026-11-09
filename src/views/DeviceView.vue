@@ -106,7 +106,7 @@ const h1_text = computed(() => {
 
 		</div>
 		<div class="col-12 mt-2 row" v-if="error_message == '' && (device_one != null || mode_edit == 2)">
-			<device v-if="mode_edit == 0" :device_item="device_one" />
+			<device v-if="mode_edit == 0" :device_item="device_one" @update="getDevice(props.id)"/>
 			<device-edit v-else :default-values="device_one" 
 				@update="updateViewAfterEdit"
 			/>
