@@ -6,7 +6,7 @@ import { useFlashStore } from '../FlashMessages/store/flash'
 const storeF = useFlashStore()
 
 const props = defineProps({
-	item: { type: Object, default: null }
+	id_device: { type: Number, default: 0 }
 })
 
 const form = ref({
@@ -28,7 +28,7 @@ async function submit() {
   data.append('fromVersion', form.value.fromVersion)
   data.append('file', form.value.file)
 
-  await MainService.postDeviceUpdate(props.item.id, data)
+  await MainService.postDeviceUpdate(props.id_device, data)
 	.then(response => {
 		const data = response.data
 		if (data.status === 200) {

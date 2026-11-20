@@ -1,5 +1,11 @@
 <script setup>
 import { computed, reactive, ref, onMounted, watch } from 'vue'
+import MainService from '../../services/MainService'
+
+import { useFlashStore } from '../FlashMessages/store/flash'
+const storeF = useFlashStore()
+
+
 
 // Nette's Form::addProtection() adds a hidden CSRF token field rendered
 // server-side. In a decoupled Vue app there is no such field to render;
@@ -24,12 +30,10 @@ const props = defineProps({
 			token: '',
 			allow_compare: false,
 			render: 'chart',
-			vorder: 10,
+			vorder: 1,
 		}),
 	},
 })
-
-const emit = defineEmits(['success'])
 
 const renders = {
 	chart: 'Základný graf',
@@ -59,7 +63,7 @@ const form = reactive({
 	token: generateToken(40),
 	allow_compare: false,
 	render: 'chart',
-	vorder: 10,
+	vorder: 1,
 })
 
 const errors = reactive({
@@ -79,37 +83,15 @@ const valid = reactive({
 	vorder: null,
 })
 
-const validForm = ref(false)
-
 const submitting = ref(false)
 
 function clearErrors() {
 	Object.keys(errors).forEach((key) => (errors[key] = ''))
 }
 
-const validate = computed(() => {
-	/*clearErrors()
-	validateName()
-	validateAppName()
-	validateToken()
-	validateRender()
-	validateVorder()*/
-
-	validForm.value = !Object.values(valid).some((value) => value === false)
-	return validForm.value 
+const validForm = computed(() => {
+	return !Object.values(valid).some((value) => value === false || value === null)
 })
-
-/*const validate = () => {
-	clearErrors()
-	validateName()
-	validateAppName()
-	validateToken()
-	validateRender()
-	validateVorder()
-
-	validForm.value = !Object.values(valid).some((value) => value === false)
-	return validForm.value
-}*/
 
 const validateName = () => {
 	if (!form.name.trim()) {
@@ -185,35 +167,47 @@ watch(() => form.vorder, () => {
 	validateVorder()
 })
 
+const emits = defineEmits(['updateView'])
+
 async function handleSubmit() {
-	if (!validate) return
+  if (!validForm.value) return
 
 	submitting.value = true
-	try {
-		// TODO ukladanie cez API
-		const response = await fetch('/api/view-form', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				// adjust to your CSRF scheme, e.g.:
-				// 'X-CSRF-Token': props.csrfToken,
-			},
-			body: JSON.stringify(form),
-		})
-
-		if (!response.ok) {
-			throw new Error(`Server vrátil chybu: ${response.status}`)
-		}
-
-		const data = await response.json()
-		emit('success', data)
-	} catch (err) {
-		// basic fallback error handling — replace with your app's approach
-		console.error(err)
-		alert('Uloženie sa nepodarilo. Skúste to prosím znovu.')
-	} finally {
-		submitting.value = false
+	
+	const data = {
+		name: form.name,
+		app_name: form.app_name,
+		vdesc: form.vdesc,
+		token: form.token,
+		allow_compare: form.allow_compare,
+		render: form.render,
+		vorder: form.vorder
 	}
+
+  await MainService.postViewUpdate(props.id, data)
+	.then(response => {
+		const data = response.data
+		if (data.status === 200) {
+			emits('updateView')
+			form.name = ''
+			form.app_name = ''
+			form.vdesc = ''
+			form.token = generateToken(40)
+			form.allow_compare = false
+			form.render = 'chart'
+			form.vorder = 1
+			storeF.showMessage('Graf bol úspešne uložený.', 'success', 'Uloženie', 5000)
+		} else {
+			storeF.showMessage('Nastala chyba pri ukladaní grafu. ' + (data.message || ''), 'danger', 'Chyba', 5000)
+			emits('updateView')
+		}
+	})
+	.catch(error => {
+		storeF.showMessage('Nastala chyba pri odozve. ' + (error.message || 'Neznáma chyba'), 'danger', 'Chyba', 5000)
+		emits('updateView')
+	})
+
+  return true
 }
 
 const classType = (type) => {
@@ -229,6 +223,12 @@ onMounted(() => {
 		form.allow_compare = props.view.allow_compare
 		form.render = props.view.render
 		form.vorder = props.view.vorder
+
+		validateName()
+		validateAppName()
+		validateToken()
+		validateRender()
+		validateVorder()
 	} else {
 		validateToken()
 		validateRender()
@@ -372,6 +372,8 @@ watch(() => props.view, () => {
 				required
 				class="form-control"
 				aria-describedby="vorderHelpBlock"
+				min="1"
+				max="999"
 			/>
 			<div v-if="errors.vorder" class="invalid-feedback">{{ errors.vorder }}</div>
 			<div id="vorderHelpBlock" class="form-text">

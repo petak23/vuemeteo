@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import ViewsSimpleList from '../components/Views/ViewsSimpleList.vue';
 import ViewsDetailList from '../components/Views/ViewsDetailList.vue';
 import ViewEditForm from '../components/Views/ViewEditForm.vue';
 import MainService from '../services/MainService.js'
 
+const router = useRouter()
 const switchView = ref(false)
 const views = ref(null)
 
@@ -13,19 +15,26 @@ const props = defineProps({
 	mode: { type: String, default: 'view' }
 })
 
-onMounted(() => {
+const getViews = () => {
 	MainService.getViews()
 	.then(response => {
-		console.log(response.data);
+		//console.log(response.data);
 		if (response.data.status == 200)
 			views.value = response.data.data
 	})
 	.catch((error) => {
 		console.log(error);
 	});
+}
+
+const onUpdateView = () => {
+	getViews()
+	router.push('/views')
+}
+
+onMounted(() => {
+	getViews()
 })
-
-
 </script>
 
 <template>
@@ -66,9 +75,10 @@ onMounted(() => {
 					<view-edit-form 
 						:view="views.views[props.id]"
 						:id="props.id"
+						@update-view="onUpdateView"
 					/>
 				</div>
-				<div class="col-12" v-if="views == null || views.views.length == 0">
+				<div class="col-12" v-if="views == null || views.views.length == 0 && props.mode === 'view'">
 					<div class="alert alert-warning" role="alert">
 						<strong>Upozornenie:</strong> Zatiaľ neexistujú žiadne grafy.
 					</div>

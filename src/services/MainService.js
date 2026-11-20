@@ -1,12 +1,10 @@
 import axios from 'axios'
 
 //const baseUrl = "http://localhost/~petak23/apimeteo/"
-//const baseUrl = "http://localhost/apimeteo/"
-const baseUrl = "https://apimeteo.echo-msz.eu/"
-
-//console.log(window.location.origin)
-//const baseUrl = (window.location.origin.includes('localhost')) ? "http://localhost/apimeteo/" : "https://apimeteo.echo-msz.eu/" 
-//console.log("Base URL: " + baseUrl)
+const isLocalhost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
+const baseUrl = isLocalhost
+	? "http://localhost/apimeteo/"
+	: "https://apimeteo.echo-msz.eu/"
 
 axios.defaults.withCredentials = true;
 
@@ -86,6 +84,12 @@ export default {
 	// Views
 	getViews() {
 		return apiClient.get('views')
+	},
+	postDeviceUpdate(id_device, data) {
+		return apiClient.post('device/' + id_device + '/update', data)
+	},
+	postViewUpdate(id_view, data) {
+		return apiClient.post('views/edit/' + id_view, data)
 	},
 
 	// Chart
