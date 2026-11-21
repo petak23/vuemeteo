@@ -1,5 +1,5 @@
 <script setup>
-import { toRaw } from 'vue'
+import { toRaw, computed } from 'vue'
 //import dayjs from 'dayjs'; //https://day.js.org/docs/en/display/format
 import DevicesSpec from './DevicesSpec.vue'
 import {
@@ -44,9 +44,25 @@ const props = defineProps({
 	return date.format('D.M.YYYY HH:mm:ss');
 }*/
 
+// Senzory zariadenia použité pre výpočet pocitovej teploty a rosného bodu (len zariadenie s id 1)
+const SPEC_DEVICE_ID = 1
+const SPEC_SENSOR = { temperature: 19, humidity: 20, windSpeed: 16 }
+
+const sensorList = computed(() => props.device?.sensors ? Object.values(props.device.sensors) : [])
+const sensorCount = computed(() => sensorList.value.length)
+
+/** Posledná hodnota senzora s daným id alebo null, ak senzor / hodnota neexistuje */
+const sensorValue = (id) => {
+	const v = props.device?.sensors?.[id]?.last_out_value
+	return v === null || v === undefined || isNaN(Number(v)) ? null : Number(v)
+}
+
+const showSpec = computed(() => props.device?.id == SPEC_DEVICE_ID && sensorCount.value > 0)
+
+const formatValue = (v) => (v === null || v === undefined || isNaN(Number(v)) ? '---' : Number(v).toFixed(2))
+
 const export_data = (records, name) => {
-	//console.log(props.device.id, records, name)
-	const reversed = [...records].reverse() // kópia poľa, originál sa nezmení
+	const reversed = Array.isArray(records) ? [...records].reverse() : [] // kópia poľa, originál sa nezmení
 	const labels = reversed.map(r => r.rec_hour)
 	const datasets = {
 		label: name,
@@ -68,20 +84,20 @@ const export_data = (records, name) => {
 		</h5>
 		<div class="card-body">
 			<p class="card-text"><small>
-				{{ props.device.desc }}<br />{{ Object.keys(props.device.sensors).length }} senzorov.<br />
-				<span v-if="Object.keys(props.device.sensors).length">
-					Posledné meranie:<br />{{ Object.values(props.device.sensors)[0].last_data_time }}
+				{{ props.device.desc }}<br />{{ sensorCount }} senzorov.<br />
+				<span v-if="sensorCount">
+					Posledné meranie:<br />{{ sensorList[0].last_data_time }}
 				</span>
 				<span v-else class="text-danger">Nemám hodnoty o meraniach!</span>
 			</small></p>
-			<h6 class="card-title" v-if="Object.keys(props.device.sensors).length">Posledné hodnoty zo senzorov:</h6>
-			<ul class="list-group list-group-flush" v-if="Object.keys(props.device.sensors).length">
+			<h6 class="card-title" v-if="sensorCount">Posledné hodnoty zo senzorov:</h6>
+			<ul class="list-group list-group-flush" v-if="sensorCount">
 				<li 
-					v-for="sen in props.device.sensors"
+					v-for="sen in sensorList"
 					:key="sen.id"
 					class="list-group-item text-primary-emphasis"
 				>
-					{{ sen.desc }} [<span class="text-muted fs-7">{{ sen.name }}</span>] ( {{ sen.last_data_time }} ): <strong>{{ sen.last_out_value.toFixed(2) }} {{ sen.value_unit }}</strong>
+					{{ sen.desc }} [<span class="text-muted fs-7">{{ sen.name }}</span>] ( {{ sen.last_data_time }} ): <strong>{{ formatValue(sen.last_out_value) }} {{ sen.value_unit }}</strong>
 					
 					<Line
 					 	v-if="props.device.id == 1" 
@@ -90,15 +106,15 @@ const export_data = (records, name) => {
 						class="sensor-chart"/>
 				</li>
 			</ul>
-			<DevicesSpec v-if="props.device.id == 1 && Object.keys(props.device.sensors).length" :sensors="props.device.sensors" 
-				:temperature="props.device.sensors[19].last_out_value"
-				:humidity="props.device.sensors[20].last_out_value"
-				:wind-speed="props.device.sensors[16].last_out_value"
+			<DevicesSpec v-if="showSpec"
+				:temperature="sensorValue(SPEC_SENSOR.temperature)"
+				:humidity="sensorValue(SPEC_SENSOR.humidity)"
+				:wind-speed="sensorValue(SPEC_SENSOR.windSpeed)"
 			/>
 		</div>
 		<div class="card-footer" v-if="props.is_logged_in">
 			<div class="d-flex justify-content-end pt-2">
-				<RouterLink :to="'props.device/' + props.device.id" class="btn btn-outline-secondary">
+				<RouterLink :to="'/device/' + props.device.id" class="btn btn-outline-secondary">
 					Viac info <i class="fa-solid fa-angles-right"></i>
 				</RouterLink>
 			</div>

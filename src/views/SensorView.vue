@@ -1,12 +1,11 @@
 <script setup>
-import { onMounted, ref, watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import SensorInfo from '../components/Sensor/SensorInfo.vue'
 import SensorStat from '../components/Sensor/SensorStat.vue'
 import SensorEdit from '../components/Sensor/SensorEdit.vue'
 import MainService from '../services/MainService'
 
-import { useRoute, useRouter } from 'vue-router'
-const route = useRoute()
+import { useRouter } from 'vue-router'
 const router = useRouter()
 
 import { useMainStore } from '../stores/main'
@@ -14,7 +13,6 @@ const store = useMainStore()
 
 const props = defineProps({
 	id: { type: Number, default: 0 },
-	edit: { type: Boolean, default: false},
 	mode: { type: String, default: 'view' }
 })
 
@@ -22,11 +20,12 @@ const sensor_one = ref(null)
 const error_message = ref("")
 
 const setError = (message) => {
-	error_message.value = message
+	error_message.value = String(message)
 	console.error(error_message.value)
 }
 
-const  getSensor = async (id) => {
+const getSensor = async (id) => {
+	error_message.value = ""
 	await MainService.getSensor(id)
 		.then(response => {
 			if (response.data.status == 200) {
@@ -41,7 +40,6 @@ const  getSensor = async (id) => {
 		})
 		.catch((error) => {
 			setError(error)
-			console.error(error)
 		})
 }
 
@@ -53,25 +51,20 @@ const getSavedSensor = (sensor) => {
 	}
 }
 
-watch(() => props.id, () => {
-	if (props.id > 0) getSensor(props.id)
-	//else setError("Chybné id: [" + props.id + "] senzoru.(1)")
-})
-
-watch(() => route.params.id, (newId) => {
-	if (newId > 0) getSensor(newId)
-	else setError("Chybné id: [" + newId + "] senzoru.(3)")
-})
+// Jediný zdroj id je prop z routera (nie route.params), takže pri odchode
+// na inú trasu (napr. /device/3) sa nenačíta senzor so zlým id.
+watch(() => props.id, (id) => {
+	if (id > 0) getSensor(id)
+	else {
+		sensor_one.value = null
+		setError("Chybné id: [" + id + "] senzoru.")
+	}
+}, { immediate: true })
 
 const h1_text = computed(() => {
 	return props.mode == 'stat' ? "Štatistika" : "Informácie" 
 })
 
-onMounted(()=> {
-	if (props.id > 0) getSensor(props.id)
-	else if (route.params.id > 0) getSensor(route.params.id) 
-	else setError("Chybné id: [" + props.id + "] senzoru.(2)")
-})
 </script>
 
 <template>

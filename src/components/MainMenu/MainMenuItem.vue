@@ -31,15 +31,12 @@ const childrenCount = computed(() => {
     return props.children == null ? '' : '(' + Object.keys(props.children).length + ')'
 })
 
-const isActiveLink = computed(() => {
-	return route.path === props.to
-})
-
 const viewSubmenu = computed(() => {
-	if (props.to == "/devices" && props.children != null && route.path.startsWith("/devices")) {
+	if (props.children == null) return false	// bez detí sa podmenu (prázdne <ul>) nevykresľuje
+	if (props.to == "/devices" && route.path.startsWith("/devices")) {
 		return true
 	}	else if (props.to.startsWith("/device/")) {	
-		return props.children != null && store.actual_device_id == props.id
+		return store.actual_device_id == props.id
 	} else if (route.path.startsWith("/device/") || route.path.startsWith("/sensor/")) {
 		return true
 	}

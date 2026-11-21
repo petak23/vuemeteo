@@ -34,22 +34,3 @@ import { RouterLink } from 'vue-router'
 		</div>
 	</div>
 </template>
-
-
-<style lang="scss" scoped>
-	.table{
-		margin-top: 1rem;
-
-		tr {
-			border: 1px solid #999;
-		}
-
-		th {
-			border-right: 2px solid #999;
-		}
-
-		td {
-			border-right: 1px solid #aaa;
-		}
-	}
-</style>

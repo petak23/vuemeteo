@@ -1,18 +1,18 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
-	temperature: {	// teplota v °C
+	temperature: {	// teplota v °C (null = hodnota nie je k dispozícii)
 		type: Number,
-		default: 20
+		default: null
 	},
 	humidity: {	// relatívna vlhkosť v %
 		type: Number,
-		default: 50
+		default: null
 	},
 	windSpeed: { // rýchlosť vetra v km/h
 		type: Number,
-		default: 10
+		default: null
 	}
 })
 
@@ -60,43 +60,44 @@ function calculateHeatIndex(tempC, RH) {
 	return (hi - 32) * 5 / 9
 }
 
-// Sledovanie typu použitého výpočtu pre používateľa
-const feelsLikeType = ref('')
-
 /**
- * Výpočet pocitovej teploty na základe meteorologických podmienok
+ * Výpočet pocitovej teploty na základe meteorologických podmienok.
+ * Vracia { value, type } – computed nemá vedľajšie efekty.
  */
-const feelsLike = computed(() => {
+const feelsLikeResult = computed(() => {
 	const T = props.temperature
 	const RH = props.humidity
 	const V = props.windSpeed
 
 	// Kontrola platnosti vstupných dát
 	if (T === null || RH === null || V === null || isNaN(T) || isNaN(RH) || isNaN(V)) {
-		feelsLikeType.value = 'Chýbajúce vstupy'
-		return null
+		return { value: null, type: 'Chýbajúce vstupy' }
 	}
 
 	let result = T
+	let type
 
 	// 1. Podmienka pre Wind Chill (Zima + Vietor)
 	if (T <= 10 && V > 4.8) {
 		result = calculateWindChill(T, V)
-		feelsLikeType.value = '(vplyv vetra - Wind Chill)'
+		type = '(vplyv vetra - Wind Chill)'
 	} 
 	// 2. Podmienka pre Heat Index (Teplo + Vlhkosť)
 	else if (T >= 26.7 && RH >= 40) {
 		result = calculateHeatIndex(T, RH)
-		feelsLikeType.value = '(vplyv vlhkosti - Heat Index)'
+		type = '(vplyv vlhkosti - Heat Index)'
 	} 
 	// 3. Bežné podmienky
 	else {
-		feelsLikeType.value = '(štandardná teplota)'
+		type = '(štandardná teplota)'
 	}
 
 	// Zaokrúhlenie na 1 desatinné miesto
-	return Math.round(result * 10) / 10
+	return { value: Math.round(result * 10) / 10, type }
 })
+
+const feelsLike = computed(() => feelsLikeResult.value.value)
+const feelsLikeType = computed(() => feelsLikeResult.value.type)
 
 /**
  * Výpočet Rosného bodu (Dew Point) pomocou Magnusovej rovnice

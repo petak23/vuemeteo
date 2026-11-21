@@ -32,7 +32,7 @@ const props = defineProps({
 	},
 });
 
-const emit = defineEmits(["save", "cancel"]);
+const emit = defineEmits(["save", "cancel", "delete"]);
 
 const formData = ref({ ...props.sensor });
 
@@ -67,27 +67,27 @@ const handleCancel = () => {
 const handleDelete = (id) => {
 	if (!props.sensor || !props.sensor.id) {
 		console.error("Invalid sensor ID for deletion.");
-		storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+		storeF.showMessage('Chybné ID senzora, senzor nebol vymazaný.', 'warning', 'Chyba', 5000)
 		return;
 	}
 	if (id !== props.sensor.id) {
 		console.error(`Mismatched sensor ID for deletion. Expected: ${props.sensor.id}, Received: ${id}`);
-		storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+		storeF.showMessage('Chybné ID senzora, senzor nebol vymazaný.', 'warning', 'Chyba', 5000)
 		return;
 	}
-	MainService.getSensorDelete(props.sensor.id)
+	MainService.postSensorDelete(props.sensor.id)
 		.then(response => {
 			if (response.data.status == 200) {
 				storeF.showMessage('Senzor bol úspešne vymazaný.', 'success', 'OK', 5000)
 				store.getDevices()
 				emit("delete", props.sensor.id);
 			} else {
-				storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+				storeF.showMessage('Senzor sa nepodarilo vymazať: ' + (response.data.message || 'neznáma chyba'), 'warning', 'Chyba', 5000)
 				console.error("Error deleting sensor:", response.data.message);
 			}
 		})
 		.catch(error => {
-			storeF.showMessage('Pri ukladaní došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
+			storeF.showMessage('Pri mazaní senzora došlo k chybe. Skúste to znovu neskôr.', 'warning', 'Chyba', 5000)
 			console.error("Error deleting sensor:", error);
 		});
 };
@@ -148,6 +148,8 @@ const handleDelete = (id) => {
 					<input
 						id="preprocess_data"
 						v-model="formData.preprocess_data"
+						:true-value="1"
+						:false-value="0"
 						type="checkbox"
 						class="form-check-input"
 					/>
@@ -182,9 +184,10 @@ const handleDelete = (id) => {
 					<input
 						id="warn_max"
 						v-model="formData.warn_max"
+						:true-value="1"
+						:false-value="0"
 						type="checkbox"
 						class="form-check-input"
-						:checked="formData.warn_max"
 					/>
 					<label for="warn_max" class="form-check-label">
 						Zapnúť zasielanie
@@ -260,6 +263,8 @@ const handleDelete = (id) => {
 					<input
 						id="warn_min"
 						v-model="formData.warn_min"
+						:true-value="1"
+						:false-value="0"
 						type="checkbox"
 						class="form-check-input"
 					/>

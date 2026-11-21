@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ViewsSimpleList from '../components/Views/ViewsSimpleList.vue';
 import ViewsDetailList from '../components/Views/ViewsDetailList.vue';
@@ -26,6 +26,10 @@ const getViews = () => {
 		console.log(error);
 	});
 }
+
+// views.views je objekt kľúčovaný id grafu (nie pole)
+const viewsCount = computed(() => views.value?.views ? Object.keys(views.value.views).length : 0)
+const editedView = computed(() => props.id > 0 ? views.value?.views?.[props.id] : undefined)
 
 const onUpdateView = () => {
 	getViews()
@@ -71,14 +75,20 @@ onMounted(() => {
 					<views-simple-list v-if="!switchView" :views="views" />
 					<views-detail-list v-else :views="views" />
 				</div>
+				<div class="col-12" v-else-if="props.mode === 'edit' && props.id > 0 && editedView === undefined">
+					<div class="alert alert-danger" role="alert">
+						Graf s ID {{ props.id }} neexistuje alebo k nemu nemáte prístup.
+					</div>
+				</div>
 				<div class="col-12" v-else-if="props.mode === 'edit'">
 					<view-edit-form 
-						:view="views.views[props.id]"
+						:view="editedView"
 						:id="props.id"
 						@update-view="onUpdateView"
+						@cancel="router.push('/views')"
 					/>
 				</div>
-				<div class="col-12" v-if="views == null || views.views.length == 0 && props.mode === 'view'">
+				<div class="col-12" v-if="views != null && viewsCount == 0 && props.mode === 'view'">
 					<div class="alert alert-warning" role="alert">
 						<strong>Upozornenie:</strong> Zatiaľ neexistujú žiadne grafy.
 					</div>
@@ -88,7 +98,7 @@ onMounted(() => {
 	</div>
 </template>
 
-<style>
+<style scoped>
 	h1 > small {
 		font-size: 0.5em;
 	}

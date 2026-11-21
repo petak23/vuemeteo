@@ -5,18 +5,7 @@ import MainService from '../../services/MainService'
 import { useFlashStore } from '../FlashMessages/store/flash'
 const storeF = useFlashStore()
 
-
-
-// Nette's Form::addProtection() adds a hidden CSRF token field rendered
-// server-side. In a decoupled Vue app there is no such field to render;
-// the CSRF token typically has to come from the backend (e.g. embedded
-// in the page, fetched from an endpoint, or handled via a same-site
-// cookie + header pair). Adjust to match how your API expects it.
 const props = defineProps({
-	csrfToken: {
-		type: String,
-		default: '',
-	},
 	id: {
 		type: Number,
 		default: 0
@@ -85,10 +74,6 @@ const valid = reactive({
 
 const submitting = ref(false)
 
-function clearErrors() {
-	Object.keys(errors).forEach((key) => (errors[key] = ''))
-}
-
 const validForm = computed(() => {
 	return !Object.values(valid).some((value) => value === false || value === null)
 })
@@ -118,7 +103,7 @@ const validateToken = () => {
 		errors.token = 'Toto pole je povinné a musí byť vyplnené.'
 		valid.token = false
 	} else if (!/^[0-9A-Za-z-]+$/.test(form.token)) {
-		errors.token = 'Len písmena, čísla a pomlčka'
+		errors.token = 'Len písmená, čísla a pomlčka'
 		valid.token = false
 	} else {
 		errors.token = ''
@@ -137,7 +122,8 @@ const validateRender = () => {
 }
 
 const validateVorder = () => {
-	if (form.vorder === null || form.vorder === '' || Number.isNaN(form.vorder)) {
+	const v = form.vorder
+	if (v === null || v === '' || !Number.isInteger(v) || v < 1) {
 		errors.vorder = 'Toto pole je povinné a musíte zadať číslo väčšie ako 0.'
 		valid.vorder = false
 	} else {
@@ -147,7 +133,6 @@ const validateVorder = () => {
 }
 
 watch(() => form.token, () => {
-	console.log('Token changed:', form.token)
 	validateToken()
 })
 
@@ -167,62 +152,62 @@ watch(() => form.vorder, () => {
 	validateVorder()
 })
 
-const emits = defineEmits(['updateView'])
+const emits = defineEmits(['updateView', 'cancel'])
+
+const error_message = ref('')
 
 async function handleSubmit() {
-  if (!validForm.value) return
+	if (!validForm.value || submitting.value) return
 
 	submitting.value = true
-	
+	error_message.value = ''
+
 	const data = {
 		name: form.name,
 		app_name: form.app_name,
 		vdesc: form.vdesc,
 		token: form.token,
-		allow_compare: form.allow_compare,
+		allow_compare: form.allow_compare ? 1 : 0,
 		render: form.render,
 		vorder: form.vorder
 	}
 
-  await MainService.postViewUpdate(props.id, data)
-	.then(response => {
-		const data = response.data
-		if (data.status === 200) {
-			emits('updateView')
-			form.name = ''
-			form.app_name = ''
-			form.vdesc = ''
-			form.token = generateToken(40)
-			form.allow_compare = false
-			form.render = 'chart'
-			form.vorder = 1
-			storeF.showMessage('Graf bol úspešne uložený.', 'success', 'Uloženie', 5000)
-		} else {
-			storeF.showMessage('Nastala chyba pri ukladaní grafu. ' + (data.message || ''), 'danger', 'Chyba', 5000)
-			emits('updateView')
-		}
-	})
-	.catch(error => {
-		storeF.showMessage('Nastala chyba pri odozve. ' + (error.message || 'Neznáma chyba'), 'danger', 'Chyba', 5000)
-		emits('updateView')
-	})
-
-  return true
+	await MainService.postViewUpdate(props.id, data)
+		.then(response => {
+			const data = response.data
+			if (data.status === 200) {
+				storeF.showMessage('Graf bol úspešne uložený.', 'success', 'Uloženie', 5000)
+				emits('updateView')
+			} else {
+				// Pri chybe ostane formulár otvorený so zadanými údajmi
+				error_message.value = 'Nastala chyba pri ukladaní grafu. ' + (data.message || '')
+			}
+		})
+		.catch(error => {
+			error_message.value = 'Nastala chyba pri odozve. ' + (error.message || 'Neznáma chyba')
+		})
+		.finally(() => {
+			submitting.value = false
+		})
 }
 
 const classType = (type) => {
 	return type == null ? '' : (type ? 'is-valid' : 'is-invalid')
 }
 
+const fillForm = () => {
+	form.name = props.view.name ?? ''
+	form.app_name = props.view.app_name ?? ''
+	form.vdesc = props.view.vdesc ?? ''
+	form.token = props.view.token ?? ''
+	form.allow_compare = props.view.allow_compare == 1
+	form.render = props.view.render ?? 'chart'
+	form.vorder = Number(props.view.vorder)
+}
+
 onMounted(() => {
 	if (props.id > 0) {
-		form.name = props.view.name
-		form.app_name = props.view.app_name
-		form.vdesc = props.view.vdesc
-		form.token = props.view.token
-		form.allow_compare = props.view.allow_compare
-		form.render = props.view.render
-		form.vorder = props.view.vorder
+		fillForm()
 
 		validateName()
 		validateAppName()
@@ -236,15 +221,7 @@ onMounted(() => {
 	}
 })
 watch(() => props.view, () => {
-	if (props.id > 0) {
-		form.name = props.view.name
-		form.app_name = props.view.app_name
-		form.vdesc = props.view.vdesc
-		form.token = props.view.token
-		form.allow_compare = props.view.allow_compare
-		form.render = props.view.render
-		form.vorder = props.view.vorder
-	}
+	if (props.id > 0) fillForm()
 })
 </script>
 
@@ -309,14 +286,14 @@ watch(() => props.view, () => {
 				type="text"
 				size="50"
 				pattern="[0-9A-Za-z\-]+"
-				title="Jen písmena, čísla, pomlčka"
+				title="Len písmená, čísla, pomlčka"
 				required
 				@blur="validateToken"
 				:class="classType(valid.token)"
 			/>
 			<div v-if="errors.token" class="invalid-feedback">{{ errors.token }}</div>
 			<div class="form-text">
-				Stane sa súčasťou URL. Zadejte dlhý náhodný text. Všetky grafy s
+				Stane sa súčasťou URL. Zadajte dlhý náhodný text. Všetky grafy s
 				rovnakým tokenom budú viditeľné v jednom bloku a budú mať spoločné ľavé menu.
 			</div>
 			
@@ -334,7 +311,7 @@ watch(() => props.view, () => {
 				Povoliť porovnávanie
 			</label>
 			<div class="form-text">
-				Pokiaľ je zaškrtnuté, bude ponúknutá možnost porovnávania s iným rokom.
+				Pokiaľ je zaškrtnuté, bude ponúknutá možnosť porovnávania s iným rokom.
 			</div>
 		</div>
 
@@ -349,7 +326,7 @@ watch(() => props.view, () => {
 				@blur="validateRender"
 				:class="classType(valid.render)"
 			>
-				<option value="" disabled>- Zvolte spôsob vykreslenia -</option>
+				<option value="" disabled>- Zvoľte spôsob vykreslenia -</option>
 				<option
 					v-for="(label, value) in renders"
 					:key="value"
@@ -372,23 +349,27 @@ watch(() => props.view, () => {
 				required
 				class="form-control"
 				aria-describedby="vorderHelpBlock"
+				@blur="validateVorder"
+				:class="classType(valid.vorder)"
 				min="1"
 				max="999"
 			/>
-			<div v-if="errors.vorder" class="invalid-feedback">{{ errors.vorder }}</div>
+			<div v-if="errors.vorder" class="invalid-feedback d-block">{{ errors.vorder }}</div>
 			<div id="vorderHelpBlock" class="form-text">
 				Poradie v menu - ak je viac grafov s rovnakým tokenom, radia sa podľa
 				tejto hodnoty. Vyššie číslo = viac hore.
 			</div>
 		</div>
 
+		<div v-if="error_message" class="alert alert-danger" role="alert">{{ error_message }}</div>
+
 		<!-- submit -->
 		<div class="form-group">
 			<button class="btn btn-success" type="submit" :disabled="(!validForm) || submitting">
-				{{ submitting ? 'Ukládám…' : 'Uložit' }}
+				{{ submitting ? 'Ukladám…' : 'Uložiť' }}
 			</button>
-			<button class="btn btn-outline-secondary ms-2" type="submit">
-				Zruš
+			<button class="btn btn-outline-secondary ms-2" type="button" @click="emits('cancel')">
+				Zrušiť
 			</button>
 		</div>
 
@@ -422,9 +403,4 @@ select {
 	font-size: 0.85rem;
 	margin: 0.25rem 0 0;
 }*/
-.error {
-	color: #c0392b;
-	font-size: 0.85rem;
-	margin: 0.25rem 0 0;
-}
 </style>

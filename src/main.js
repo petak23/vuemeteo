@@ -1,5 +1,3 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
@@ -11,9 +9,10 @@ import {createBootstrap} from 'bootstrap-vue-next'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 import '@mdi/font/css/materialdesignicons.css'
+import '@fortawesome/fontawesome-free/css/all.css'
 
+import './assets/main.css'
 import './assets/main.scss'
-import './color-modes'
 
 const app = createApp(App)
 

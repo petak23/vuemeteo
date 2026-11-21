@@ -132,7 +132,7 @@ const handleUpdate = () => {
 	<div class="col-12 col-md-10 bg-secondary-subtle">{{ item.blob_token }}</div>
 	
 	<div class="col-12 col-md-2 bg-light-subtle">Kontrolovať v monitoringu:</div>
-	<div class="col-12 col-md-10 bg-light-subtle">{{ item.monitoring ==1 ? 'áno' : 'ne' }}</div>
+	<div class="col-12 col-md-10 bg-light-subtle">{{ item.monitoring == 1 ? 'áno' : 'nie' }}</div>
 
 	<DeviceOtaUpdate :item="item" @update="handleUpdate" />
 
@@ -160,9 +160,10 @@ const handleUpdate = () => {
 		v-model="viewConfigModal"
 		:title="'Poslať zmenu konfigurácie pre zariadenie ' + item.name"
 		centered
-		class="modal-xl"
+		size="xl"
+		no-footer
 	>
-		<device-send-config :item="item" />
+		<device-send-config :item="item" @update="viewConfigModal = false; handleUpdate()" />
 	</BModal>
 
 	<sensor-tab 
@@ -186,7 +187,8 @@ const handleUpdate = () => {
 	</div>
 	
 	<div class="col-12 border-top mt-1 pt-2" v-if="item.subory">
-		<h3>Súbory</h3><!-- TODO odkazy -->
-		V zariadení je uložené <a href="Device:blobs item.id"><b>{{ item.subory }}</b> súborov</a>.
+		<h3>Súbory</h3>
+		<!-- TODO: odkaz na zoznam súborov, keď bude existovať stránka/API pre súbory zariadenia -->
+		V zariadení je uložené <b>{{ item.subory }}</b> súborov.
 	</div>
 </template>

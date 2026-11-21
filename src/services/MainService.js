@@ -6,11 +6,9 @@ const baseUrl = isLocalhost
 	? "http://localhost/apimeteo/"
 	: "https://apimeteo.echo-msz.eu/"
 
-axios.defaults.withCredentials = true;
-
 const apiClient = axios.create({
 	baseURL: baseUrl,
-	withCredentials: true, //false, // This is the default
+	withCredentials: true, // posielať session cookie aj na iný (API) origin
 	headers: {
 		Accept: 'application/json'
 	},
@@ -46,8 +44,8 @@ export default {
 	postSaveUnit(id, unit_data) {
 		return apiClient.post('unit/save/' + id, unit_data)
 	},
-	getDeleteUnit(id) {
-		return apiClient.get('unit/delete/' + id)
+	postDeleteUnit(id) {
+		return apiClient.post('unit/delete/' + id)
 	},
 	
 	postDeviceEdit(id_device, data) {
@@ -60,16 +58,16 @@ export default {
 	postSensorEdit(id_sensor, data) {
 		return apiClient.post('sensor/edit/' + id_sensor , data)
 	},
-	getSensorDelete(id_sensor) {
-		return apiClient.get('sensor/delete/' + id_sensor)
+	postSensorDelete(id_sensor) {
+		return apiClient.post('sensor/delete/' + id_sensor)
 	},
 
 	// User
 	postLogIn(data) {
 		return apiClient.post('/login', data)
 	},
-	getLogOut() {
-		return apiClient.get('/logout')
+	postLogOut() {
+		return apiClient.post('/logout')
 	},
 	getMyUserData() {
 		return apiClient.get('user/user')
@@ -85,15 +83,12 @@ export default {
 	getViews() {
 		return apiClient.get('views')
 	},
-	postDeviceUpdate(id_device, data) {
-		return apiClient.post('device/' + id_device + '/update', data)
-	},
 	postViewUpdate(id_view, data) {
 		return apiClient.post('views/edit/' + id_view, data)
 	},
 
 	// Chart
-	getChartSensor($id_sensor, params) {
-		return apiClient.get('chart/sensor/' + $id_sensor, { params: params })
+	getChartSensor(id_sensor, params) {
+		return apiClient.get('chart/sensor/' + id_sensor, { params: params })
 	}
 }

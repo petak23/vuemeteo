@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch } from 'vue'
+import { onMounted } from 'vue'
 import LogInForm from '../components/LogInForm.vue'
 import { useMainStore } from '../stores/main'
 import { useRouter } from 'vue-router'
@@ -14,16 +14,13 @@ const props = defineProps({
 	}
 })
 
-// Presmerovanie na Homepage ak je užívateľ prihlásený
-watch(() => store.user, () => {
-	if (store.user !== null) {
-		router.push('/')
-	}
-})
-onMounted(() => {
-	if (store.user !== null) {
-		router.push('/')
-	}
+// Už prihláseného užívateľa presmeruj z prihlasovacej stránky na Homepage.
+// Pri odhlásení presmerovanie rieši LogInForm až po dokončení odhlásenia.
+// Po úspešnom prihlásení presmerúva LogInForm.
+onMounted(async () => {
+	if (props.logOut) return
+	await store.ensureUser()
+	if (store.is_logged_in) router.replace('/')
 })
 </script>
 
@@ -32,7 +29,7 @@ onMounted(() => {
 		<div class="col-12 w-100">
 			<h1 class="mt-4">
 				<i class="fa-solid me-2" :class="!props.logOut ? 'fa-sign-in-alt' : 'fa-arrow-right-from-bracket'"></i>
-				{{ 'Prihlásenie' }}
+				{{ props.logOut ? 'Odhlásenie' : 'Prihlásenie' }}
 			</h1>
 			<LogInForm 
 				class="mt-4 mb-5"

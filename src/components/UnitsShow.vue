@@ -44,8 +44,11 @@ const hideModals = () => {
 const getUnits = () => {
 	MainService.getUnits()
 		.then(response => {
-			if (response.data.status == 200)
+			if (response.data.status == 200) {
 				items.value = response.data.data
+			} else {
+				storeF.showMessage('Jednotky sa nepodarilo načítať: ' + (response.data.message || 'neznáma chyba'), 'danger', 'Chyba', 5000)
+			}
 		})
 		.catch((error) => {
 			storeF.showMessage('Nastala chyba pri načítaní jednotiek.', 'danger', 'Chyba', 5000)
@@ -70,7 +73,7 @@ const saveUnit = (id) => {
 		});
 }
 const deleteUnit = (id) => {
-	MainService.getDeleteUnit(id)
+	MainService.postDeleteUnit(id)
 		.then(response => {
 			if (response.data.status == 200 && response.data.data !== undefined) {
 				items.value = response.data.data
@@ -138,16 +141,16 @@ const deleteUnit = (id) => {
 		body-text-variant="white"
   >
 		<template #title>
-			Úprava jednotky:
+			{{ active_unit_id > 0 ? 'Úprava jednotky:' : 'Pridanie jednotky:' }}
 		</template>
 		<div class="text-center">
-			<div class="alert alert-warning" role="alert">
+			<div class="alert alert-warning" role="alert" v-if="active_unit_id > 0">
 				<b>Upozornenie:</b>
 				Zmena názvu jednotky sa prejaví vo všetkých senzoroch, ktoré ju používajú.
 			</div>
-			<label for="unit_name" class="me-2">Uprav názov jednotky:</label>
+			<label for="unit_name" class="me-2">{{ active_unit_id > 0 ? 'Uprav názov jednotky:' : 'Názov jednotky:' }}</label>
 			<input type="text" id="unit_name" v-model="unit_name" />
-			<label for="unit_description" class="me-2">Uprav popis jednotky:</label>
+			<label for="unit_description" class="me-2">{{ active_unit_id > 0 ? 'Uprav popis jednotky:' : 'Popis jednotky:' }}</label>
 			<input type="text" id="unit_description" v-model="unit_description" />
 		</div>
 		<template #footer>

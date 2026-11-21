@@ -1,19 +1,21 @@
 <script setup>
-import { computed, reactive, watch } from 'vue'
+import { reactive, watch } from 'vue'
+import dayjs from 'dayjs'
+
+// Dnešný dátum v lokálnom čase (toISOString by vrátil UTC – okolo polnoci včerajší deň)
+const today = () => dayjs().format('YYYY-MM-DD')
 
 const props = defineProps({
 	id: { type: [String, Number], required: true },
-	dateFrom: { type: String, default: () => new Date().toISOString().split('T')[0] },
+	dateFrom: { type: String, default: () => dayjs().format('YYYY-MM-DD') },
 	lenDays: { type: Number, default: 3 },
 	altYear: { type: [String, Number], default: null },
 	allowCompare: { type: Boolean, default: true },
 	years: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['update:dateFrom', 'update:lenDays', 'update:altYear',
-													'update:minus', 'update:plus', 
-													'update:link',
-												])
+// Jediná udalosť s kompletnými parametrami grafu: { dateFrom, lenDays, altYear }
+const emit = defineEmits(['update:params'])
 
 const form = reactive({
 	dateFrom: props.dateFrom,
@@ -21,58 +23,32 @@ const form = reactive({
 	altYear: props.altYear ?? null,
 })
 
-watch(
-	() => props.dateFrom,
-	(value) => {
-		form.dateFrom = value
-	}
-)
-watch(
-	() => props.lenDays,
-	(value) => {
-		form.lenDays = value
-	}
-)
-watch(
-	() => props.altYear,
-	(value) => {
-		form.altYear = value
-	}
-)
-watch(
-	() => form.dateFrom,
-	(value) => {
-		dateFromSend(value)
-	}
-)
-watch(
-	() => form.lenDays,
-	(value) => {
-		emit('update:lenDays', Number(value))
-	}
-)
-watch
-(
-	() => form.altYear,
-	(value) => {
-		if (value === "") {
-			form.altYear = null
-		}
-		emit('update:altYear', form)
-	}
-)
+// Zmena zvonka (props) -> formulár
+watch(() => [props.dateFrom, props.lenDays, props.altYear], ([dateFrom, lenDays, altYear]) => {
+	form.dateFrom = dateFrom
+	form.lenDays = lenDays
+	form.altYear = altYear ?? null
+})
+
+// Akákoľvek zmena formulára (preddefinované tlačidlá, input dátumu, select dĺžky aj roku) -> rodič
+watch(() => [form.dateFrom, form.lenDays, form.altYear], () => {
+	if (!form.dateFrom) return	// neúplne zadaný dátum v inpute
+	emit('update:params', {
+		dateFrom: form.dateFrom,
+		lenDays: Number(form.lenDays),
+		altYear: form.altYear === '' || form.altYear == null ? null : Number(form.altYear),
+	})
+})
 
 function addDays(dateStr, days = 0) {
-  const d = new Date(dateStr)      // 2026-03-26
-  d.setDate(d.getDate() + days)    // + alebo - dní
-  return d.toISOString().split('T')[0]
+	return dayjs(dateStr).add(days, 'day').format('YYYY-MM-DD')
 }
 
 const updateLink = (val) => {
-	const d = new Date().toISOString().split('T')[0]
+	const d = today()
 	switch (val) {
 		case 'day':
-			form.dateFrom = addDays(d)
+			form.dateFrom = d
 			form.lenDays = 1
 			break;
 		case 'now':
@@ -88,7 +64,7 @@ const updateLink = (val) => {
 			form.lenDays = 31
 			break;
 		case 'year':
-			form.dateFrom = new Date(Date.UTC(new Date().getFullYear(), 0, 1)).toISOString().split('T')[0]
+			form.dateFrom = dayjs().startOf('year').format('YYYY-MM-DD')
 			form.lenDays = 366
 			break;
 		case 'minus':
@@ -112,25 +88,21 @@ const updateLink = (val) => {
 		default:
 			break;
 	}
-
-	emit('update:link', form)
 }
 
+// Posun porovnávacieho roku. Ak ešte nie je zvolený, začne sa od roku zobrazeného obdobia.
 const updateAltYear = (val) => {
+	const base = form.altYear ? Number(form.altYear) : dayjs(form.dateFrom).year()
 	switch (val) {
 		case 'minus':
-			form.altYear = form.altYear ? Number(form.altYear) - 1 : null
+			form.altYear = base - 1
 			break;
 		case 'plus':
-			form.altYear = form.altYear ? Number(form.altYear) + 1 : null
+			form.altYear = base + 1
 			break;
 		default:
 			break;
 	}
-	//emit("update:altYear", form) // emit by sa mal udiať cez watch
-}
-const dateFromSend = (val) => {
-	emit("update:dateFrom", val)
 }
 </script>
 
@@ -149,7 +121,7 @@ const dateFromSend = (val) => {
 						<i class="fa fa-arrow-circle-left fa-2x"></i>
 					</button>
 				</td>
-				<td class="align-center">
+				<td class="text-center">
 					Predvoľby:
 					<div class="btn-group" role="group" aria-label="Predvoľby">
 						<button type="button" @click="updateLink('day')" class="btn btn-outline-secondary btn-sm">Aktuálny deň.</button>
@@ -172,7 +144,7 @@ const dateFromSend = (val) => {
 			</tr>
 
 			<tr>
-				<td class="align-center">
+				<td class="text-center">
 					<div class="row">
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">
 							<button @click="updateLink('minusyear')" class="btn btn-outline-secondary btn-sm">- rok</button>
@@ -203,7 +175,7 @@ const dateFromSend = (val) => {
 							<input 
 								type="date" 
 								v-model="form.dateFrom"
-								:max="new Date().toISOString().split('T')[0]" 
+								:max="today()" 
 								aria-label="date" id="date_from"/>
 						</div>
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">
@@ -214,7 +186,7 @@ const dateFromSend = (val) => {
 				</td>
 			</tr>
 			<tr v-if="props.allowCompare">
-				<td class="align-center">
+				<td class="text-center">
 					<div class="row">
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">
 							<button @click="updateAltYear('minus')" class="btn btn-outline-secondary btn-sm">- rok</button>
@@ -223,9 +195,9 @@ const dateFromSend = (val) => {
 							Porovnávací rok:
 						</div>
 						<div class="col">
-							<select class="form-select form-select-sm" v-model="form.altYear">
-								<option value=""></option>
-								<option v-for="year in props.years" :key="year" :value="year">{{ year }}</option>
+							<select class="form-select form-select-sm" v-model.number="form.altYear">
+								<option :value="null"></option>
+								<option v-for="year in props.years" :key="year" :value="Number(year)">{{ year }}</option>
 							</select>
 						</div>
 						<div class="col btn-group" role="group" aria-label="Posun obdobia">

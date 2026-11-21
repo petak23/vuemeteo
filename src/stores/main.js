@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import MainService from '../services/MainService'
 
@@ -17,6 +17,9 @@ export const useMainStore = defineStore('main', () => {
 	const is_logged_in = computed(() => user.value !== null)
 
 	const token = ref(null)
+
+	const user_loaded = ref(false)	// true, keď už je známe, či je niekto prihlásený
+	let userPromise = null					// prebiehajúce načítanie užívateľa (zdieľané medzi volaniami)
 
 	const main_menu = ref([
 		{
@@ -60,37 +63,43 @@ export const useMainStore = defineStore('main', () => {
 	const actual_device_id = ref(null) // ID práve zobrazeného zariadenia
 	const actual_sensor_id = ref(null) // ID práve zobrazeného senzora
 
+	// Položka hlavného menu, do ktorej sa pridávajú zariadenia (hľadá sa podľa cesty, nie indexu)
+	const devicesMenuItem = () => main_menu.value.find(item => item.to === '/devices')
+
 	const addDevicesToMenu = () => {
-		if (devices.value !== null) {
-			//console.log("Adding devices to menu...")
-			//console.log(devices.value)
-			main_menu.value[3].children = []
-			for (const device of Object.values(devices.value)) {
-				if (device.sensors !== null) {
-					device.children = []
-					for (const sensor of Object.values(device.sensors)) {
-						device.children.push({
-							id: sensor.id,
-							only_logged_in: true,
-							to: '/sensor/' + sensor.id,
-							name: sensor.name,
-							fa_icon: null,
-							children: null
-						})
-					}
-				} else {
-					device.children = null
+		const menuItem = devicesMenuItem()
+		if (devices.value === null || menuItem === undefined) return
+
+		menuItem.children = []
+		for (const device of Object.values(devices.value)) {
+			let children = null
+			if (device.sensors != null) {
+				children = []
+				for (const sensor of Object.values(device.sensors)) {
+					children.push({
+						id: sensor.id,
+						only_logged_in: true,
+						to: '/sensor/' + sensor.id,
+						name: sensor.name,
+						fa_icon: null,
+						children: null
+					})
 				}
-				main_menu.value[3].children.push({
-					id: device.id,
-					only_logged_in: true,
-					to: '/device/' + device.id,
-					name: device.name,
-					fa_icon: null,
-					children: device.children
-				})
 			}
+			menuItem.children.push({
+				id: device.id,
+				only_logged_in: true,
+				to: '/device/' + device.id,
+				name: device.name,
+				fa_icon: null,
+				children: children
+			})
 		}
+	}
+
+	const clearDevicesMenu = () => {
+		const menuItem = devicesMenuItem()
+		if (menuItem !== undefined) menuItem.children = null
 	}
 
 	const setActualDeviceId = (id, ids = null) => {
@@ -103,54 +112,65 @@ export const useMainStore = defineStore('main', () => {
 		actual_sensor_id.value = null
 	}
 
-	watch(() => devices, () => {
-		main_menu.value[3].children = devices.value
-	})
-
+	/**
+	 * Zistí, či má prihlásený užívateľ oprávnenie k zdroju (resource) a akcii.
+	 * Záznam s action == null povoľuje všetky akcie zdroja.
+	 */
 	const checkUserPermission = (resource, action = null) => {
-		let edit_enabled = false
-		if (user.value != null && user.value.id != undefined) {
-			user_permission.value.forEach(function check(item) {
-				if (item.resource == resource) {
-					let p = false
-					if (item.action == null) {
-						p = true
-					} else if (Array.isArray(item.action) && item.action.includes(action)) {
-						p = true
-					}
-					edit_enabled = p
-				}
-			}, this)
-		}
+		if (user.value == null || user.value.id == undefined) return false
+		if (!Array.isArray(user_permission.value)) return false
 
-		return edit_enabled
+		return user_permission.value.some(item =>
+			item.resource == resource &&
+			(item.action == null || (Array.isArray(item.action) && item.action.includes(action)))
+		)
 	}
 
+	/** Nastaví (alebo pri null vymaže) údaje prihláseného užívateľa podľa odpovede API */
+	const setUserData = (data = null) => {
+		user_loaded.value = true
+		if (data != null && data.status == 200 && data.user != null) {
+			user.value = data.user
+			token.value = data.token ?? null
+			user_permission.value = data.permission ?? null
+		} else {
+			user.value = null
+			token.value = null
+			user_permission.value = null
+			clearDevicesMenu()
+		}
+	}
+
+	/** Načíta aktuálne prihláseného užívateľa (API vráti status 401, ak nie je nikto prihlásený) */
 	const getActualUser = () => {
-		MainService.getMyUserData()
+		userPromise = MainService.getMyUserData()
 			.then(response => {
-				if (response.data.status == 200) {	// Prihlásený v poriadku
-					user.value = response.data.user
-					user_permission.value = response.data.user.permission
-				} else if (response.data.status == 401) { // Neprihlásený užívateľ
-					user.value = null
-					user_permission.value = response.data.user.permission
-				} else {
-					user.value = null
-					user_permission.value = null
-				}
+				setUserData(response.data)
 			})
 			.catch((error) => {
-				console.log(error)
+				console.error(error)
+				user_loaded.value = true
 			})
+		return userPromise
 	}
 
+	/** Zaručí, že je užívateľ načítaný (načíta ho len raz, ďalšie volania čakajú na ten istý request) */
+	const ensureUser = () => {
+		if (user_loaded.value) return Promise.resolve()
+		return userPromise ?? getActualUser()
+	}
+
+	let devicesRequestNr = 0	// poradové číslo požiadavky – staršie (pomalšie) odpovede sa ignorujú
+
 	const getDevices = () => {
-		MainService.getDevices(is_logged_in.value)
+		const requestNr = ++devicesRequestNr
+		const logged = is_logged_in.value
+		MainService.getDevices(logged)
 			.then(response => {
+				if (requestNr !== devicesRequestNr) return	// medzitým bola odoslaná novšia požiadavka
 				if (response.data.status == 200) {
 					devices.value = response.data.data
-					if (is_logged_in.value) addDevicesToMenu()
+					if (logged) addDevicesToMenu()
 				}
 				else {
 					devices.value = null
@@ -165,8 +185,8 @@ export const useMainStore = defineStore('main', () => {
 	return { 
 		appName, links, dataRetentionDays, minYear, user, is_logged_in, token, 
 		main_menu, 
-		devices, addDevicesToMenu, setActualDeviceId, resetActualDeviceId, actual_device_id, actual_sensor_id,
-		checkUserPermission, getActualUser, user_permission,
+		devices, addDevicesToMenu, clearDevicesMenu, setActualDeviceId, resetActualDeviceId, actual_device_id, actual_sensor_id,
+		checkUserPermission, setUserData, getActualUser, ensureUser, user_loaded, user_permission,
 		getDevices
 	}
 })

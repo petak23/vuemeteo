@@ -6,19 +6,9 @@ const props = defineProps({
   sensor: {type: Object, default: null}
 })
 
-const sensorWarnMax = computed(() => {
-	return props.sensor.warn_max == 1 ?
-					"Pre &gt;= <b>" + props.sensor.warn_max_val+"</b> "+props.sensor.unit+" zasielame text: '<b>"+props.sensor.warn_max_text+"</b>'"
-					+ (props.sensor.warn_max_after > 0 ? " po <b>"+props.sensor.warn_max_after+"</b> sekundách" : "")
-					: "-" 
-})
-
-const sensorWarnMim = computed(() => {
-	return props.sensor.warn_min == 1 ?
-					"Pre &lt;= <b>" + props.sensor.warn_min_val+"</b> "+props.sensor.unit+" zasielame text: '<b>"+props.sensor.warn_min_text+"</b>'"
-					+ (props.sensor.warn_min_after > 0 ? " po <b>"+props.sensor.warn_min_after+"</b> sekundách" : "")
-					: "-" 
-})
+// Varovania sa skladajú zo šablóny, hodnoty (aj text zadaný užívateľom) sa vypisujú cez {{ }} – bez v-html
+const warnMax = computed(() => props.sensor.warn_max == 1)
+const warnMin = computed(() => props.sensor.warn_min == 1)
 </script>
 
 <template>
@@ -40,7 +30,7 @@ const sensorWarnMim = computed(() => {
 	<div class="row px-2 bg-secondary-subtle">
 		<div class="col-12 col-md-4">Typ meraných dát:</div>
 		<div class="col-12 col-md-8"> 
-			<p v-if="props.sensor.device_class == 1">
+			<p v-if="props.sensor.id_sensor_classes == 1">
 				<b>1</b> - Kontinuálne so sumarizáciou.
 				<small>
 					<br>Predpokladá sa, že sa meria spojitá veličina ako je napríklad teplota, tlak alebo výška hladiny 
@@ -50,14 +40,14 @@ const sensorWarnMim = computed(() => {
 					<br>Detailné namerané dáta sa po určitej dobe mažú, sumárne dáta zostávajú.
 				</small>
 			</p>
-			<p v-else-if="props.sensor.device_class == 2">	
+			<p v-else-if="props.sensor.id_sensor_classes == 2">	
 				<b>2</b> - Kontinuálne bez sumarizácie.
 				<small>
 					<br>Predpokladá sa, že sa meria spojitá veličina ako je napríklad teplota, tlak alebo výška hladiny. 
 					<br>Nepočítajú sa sumárne dáta.
 				</small>
 			</p>
-			<p v-else-if="props.sensor.device_class == 3">
+			<p v-else-if="props.sensor.id_sensor_classes == 3">
 				<b>3</b> - Impulzné dáta so sumarizáciou.
 				<small>
 					<br>Meria sa impulzná veličina - t.j. počet jednotiek načítaných z plynomera, počet preskočení zrážkomera atď.
@@ -66,7 +56,7 @@ const sensorWarnMim = computed(() => {
 					<br>Grafy sa vykresľujú z hodinových alebo denných súčtov.
 				</small>
 			</p>
-			<p v-else-if="props.sensor.device_class == 4">
+			<p v-else-if="props.sensor.id_sensor_classes == 4">
 				<b>4</b> - "Impulzné" dáta s počítaním konkrétnej hodnoty nie impulzov.
 			</p>
 		</div>
@@ -93,11 +83,22 @@ const sensorWarnMim = computed(() => {
 	</div>
 	<div class="row px-2 bg-light-subtle">
 		<div class="col-12 col-md-4">Upozornenie na maximum:</div>
-		<div class="col-12 col-md-8" v-html="sensorWarnMax"></div>
+		<div class="col-12 col-md-8">
+			<span v-if="warnMax">
+				Pre &gt;= <b>{{ props.sensor.warn_max_val }}</b> {{ props.sensor.unit }} zasielame text: '<b>{{ props.sensor.warn_max_text }}</b>'
+				<span v-if="props.sensor.warn_max_after > 0"> po <b>{{ props.sensor.warn_max_after }}</b> sekundách</span>
+			</span>
+			<span v-else>-</span>
+		</div>
 	</div>
 	<div class="row px-2 bg-secondary-subtle">
 		<div class="col-12 col-md-4">Upozornenie na minimum:</div>
-		<div class="col-12 col-md-8" v-html="sensorWarnMim">
+		<div class="col-12 col-md-8">
+			<span v-if="warnMin">
+				Pre &lt;= <b>{{ props.sensor.warn_min_val }}</b> {{ props.sensor.unit }} zasielame text: '<b>{{ props.sensor.warn_min_text }}</b>'
+				<span v-if="props.sensor.warn_min_after > 0"> po <b>{{ props.sensor.warn_min_after }}</b> sekundách</span>
+			</span>
+			<span v-else>-</span>
 		</div>
 	</div>
 

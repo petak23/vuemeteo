@@ -11,9 +11,9 @@ const props = defineProps({
 <template>
 	<div class="row">
 		<h6 class="col-12 pt-2">Token</h6>
-		<div class="col-12 mb-3" v-for="view in props.views.views" :key="view.id_view">
+		<div class="col-12 mb-3" v-for="view in props.views.views" :key="view.id">
 			<div class="w-100 bg-primary-subtle text-primary-emphasis p-1">{{ view.token }}</div>
-			<table density="compact" theme="dark" class="table mt-2">
+			<table class="table mt-2">
 				<thead>
 					<tr>
 						<th>Pohľad</th>

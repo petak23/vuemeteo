@@ -15,12 +15,7 @@ export const useFlashStore = defineStore('flash', () => {
 		})
 	}
 
-	/** Vráti prvú správu a zároveň ju aj vymaže */
-	function getFirst () {
-		return flashMessages.value.shift()
-	}
-
 	return {
-		flashMessages, showMessage, getFirst
+		flashMessages, showMessage
 	}
 })

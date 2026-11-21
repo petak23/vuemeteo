@@ -1,64 +1,59 @@
 <script setup>
 /**
  * Komponenta pre vypísanie flash správ.
- * Posledna zmena 14.01.2025
+ * Posledna zmena 21.11.2026
  *
  * @author     Ing. Peter VOJTECH ml. <petak23@gmail.com>
  * @copyright  Copyright (c) 2012 - 2025 Ing. Peter VOJTECH ml.
  * @license
  * @link       http://petak23.echo-msz.eu
- * @version    1.0.7
+ * @version    1.0.8
  */
 
-import { ref, watch, toRaw, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useFlashStore } from './store/flash'
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
 
 const storeF = useFlashStore()
-
-const mess = ref([])	// pole aktuálne zobrezených správ
-		
-const hide = () => {
-	mess.value.shift()
-}
-
 const { flashMessages } = storeToRefs(storeF)
 
-const visible = computed(() => {
-	return mess.value.length > 0 
-})
+const mess = ref([])	// pole aktuálne zobrazených správ
+let nextId = 0				// jedinečný kľúč pre každú zobrazenú správu
 
-watch(storeF.flashMessages, () => {
-	if (flashMessages.value.length > 0) {
-		const fm = toRaw(flashMessages.value.shift())
-		mess.value.push(fm)
-		if (typeof fm.timeout !== 'undefined' && parseInt(fm.timeout) > 0) {
-			setTimeout(() => hide(), parseInt(fm.timeout))
+const hide = (id) => {
+	mess.value = mess.value.filter(m => m.id !== id)
+}
+
+// Presunie všetky čakajúce správy zo store do zobrazených (nie len prvú)
+watch(() => flashMessages.value.length, (len) => {
+	if (len === 0) return
+	const pending = flashMessages.value.splice(0)
+	for (const fm of pending) {
+		const id = nextId++
+		mess.value.push({ ...fm, id })
+		const timeout = parseInt(fm.timeout)
+		if (timeout > 0) {
+			setTimeout(() => hide(id), timeout)
 		}
 	}
-})
+}, { immediate: true })
 
 </script>
 
 <template>
-	<ul class="alert-container" v-if="visible">
-		<li
-			v-for="(m, index) in mess" 
-			:key="index"
-		>
-			<transition name="fade">
-				<div 
-					class="alert alert-dismissible fade show" 			
-					:class="'alert-'+m.type"
-					v-if="visible"
-				>
-					<h4 class="alert-heading" v-if="m.heading">{{ m.heading }}</h4>
-					<div v-html="m.message"></div>
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			</transition>
+	<TransitionGroup tag="ul" name="fade" class="alert-container">
+		<li v-for="m in mess" :key="m.id">
+			<div
+				class="alert alert-dismissible"
+				:class="'alert-' + m.type"
+				role="alert"
+			>
+				<h4 class="alert-heading" v-if="m.heading">{{ m.heading }}</h4>
+				<div>{{ m.message }}</div>
+				<button type="button" class="btn-close" aria-label="Close" @click="hide(m.id)"></button>
+			</div>
 		</li>
-	</ul>
+	</TransitionGroup>
 </template>
 
 <style lang="scss" scoped>
@@ -66,8 +61,10 @@ watch(storeF.flashMessages, () => {
 	position: fixed;
 	right: 2em;
 	bottom: 2em;
-  max-width: 50vw;
-  z-index: 2000;
+	max-width: 50vw;
+	z-index: 2000;
+	margin: 0;
+	padding: 0;
 
 	li {
 		list-style: none;
@@ -85,7 +82,7 @@ watch(storeF.flashMessages, () => {
 .fade-leave-active {
 	transition: opacity 0.5s;
 }
-.fade-enter,
+.fade-enter-from,
 .fade-leave-to {
 	opacity: 0;
 }

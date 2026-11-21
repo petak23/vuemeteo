@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import Device_popover from './Device_popover.vue'
+import dayjs from 'dayjs'
 
 const props = defineProps({
 	sensors: {
@@ -8,11 +9,16 @@ const props = defineProps({
 		default: null
 	}
 })
+
+const format_date = (value) => {
+	if (value == null) return "---"
+	return dayjs(value).format('D.M.YYYY HH:mm:ss')
+}
 </script>
 
 
 <template>
-	<div v-if="props.sensors != null && Object.keys(props.sensors).length" class="row pl-4 pr-1 py-2">
+	<div v-if="props.sensors != null && Object.keys(props.sensors).length" class="row ps-4 pe-1 py-2">
 		<div class="col-12">
 			<div class="row bg-secondary-subtle sensor-head">
 				<div class="col-6 col-md-2"><small>(id)</small>Senzor</div>
@@ -21,6 +27,7 @@ const props = defineProps({
 				<div class="col-6 col-md-1">Faktor</div>
 				<div class="col-6 col-md-2">Interval</div>
 				<div class="col-12 col-md-2">Popis</div>
+				<div class="col-6 col-md-2">Akcie</div>
 			</div>
 			<div 
 				v-for="(sensor, k, index) in props.sensors" :key="sensor.id" 
@@ -32,7 +39,7 @@ const props = defineProps({
 						<small>({{ k }})</small><b>{{sensor.name}}</b>
 					</RouterLink>
 					<Device_popover v-if="sensor.warningIcon > 0"
-						:fa_icon="'exclamation-triangle ' + sensor.warningIcon == 1 ? 'text-danger' : 'text-warning'"
+						:fa_icon="'exclamation-triangle ' + (sensor.warningIcon == 1 ? 'text-danger' : 'text-warning')"
 						:text="'Senzor nedodáva data. Posledné data: ' + format_date(sensor.last_data_time) + '.'"
 					/>
 				</div>

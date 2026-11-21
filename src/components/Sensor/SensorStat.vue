@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch} from 'vue'
+import { ref, watch, computed } from 'vue'
 import MainService from '../../services/MainService'
 import InfoMessage from '../PageComponents/InfoMessage.vue'
 
@@ -33,14 +33,15 @@ const getSensorStats = async (id) => {
 		})
 }
 
-watch(() => props.sensor, () => {
-	if (props.sensor && props.sensor.id > 0) getSensorStats(props.sensor.id)
-	else setError("Chybné id: [" + props.sensor.id + "] senzoru.(1)")
-})
+watch(() => props.sensor?.id, (id) => {
+	if (id > 0) getSensorStats(id)
+	else setError("Chybné id: [" + id + "] senzoru.")
+}, { immediate: true })
 
-onMounted(() => {
-	if (props.sensor && props.sensor.id > 0) getSensorStats(props.sensor.id)
-	else setError("Chybné id: [" + props.sensor.id + "] senzoru.(2)")
+// Najstarší rok s dátami – API vracia roky zostupne (posledný = najstarší)
+const oldestYear = computed(() => {
+	const years = sensorStats.value?.years
+	return Array.isArray(years) && years.length ? years[years.length - 1] : null
 })
 
 const toMaxDecimalPlaces = (value, places) => {
@@ -103,7 +104,7 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 			<RouterLink :to="'/chart/sensor/' + props.sensor.id + '/?dateFrom=' + sensorStats.sumdataStats.max_date + '&lenDays=' + sensorStats.lenDays + '&altYear=' + sensorStats.altYear"
 			>{{ sensorStats.sumdataStats.max_date }}</RouterLink>.
 		</span>
-		<span v-else-if="props.sensor.device_class == 2">
+		<span v-else-if="props.sensor.id_sensor_classes == 2">
 			Pre toto zariadenie nie sú počítané sumárne dáta.
 		</span>
 		<span v-else>
@@ -122,23 +123,23 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 		<h3>Mesačná sumarizácia</h3>	
 
 		<table 
-			v-if="props.sensor.device_class == 3"
+			v-if="props.sensor.id_sensor_classes == 3"
 			class="table table-striped table-bordered table-hover table-sm "
 		>
-			<thead class="thead-light">
+			<thead class="table-light">
 				<tr>
 					<th>Rok</th>
 					<th>Jednotka</th>
-					<th class="text-right">Suma</th>
-					<th v-for="i in 12" :key="i" class="text-right">{{ String(i).padStart(2, '0') }}</th>
+					<th class="text-end">Suma</th>
+					<th v-for="i in 12" :key="i" class="text-end">{{ String(i).padStart(2, '0') }}</th>
 				</tr>
 			</thead>
 
 				<tr v-for="(rokData, rok) in sensorStats.mesicniSumarizace" :key="rok">
 					<td><b>{{ rok }}</b></td>
 					<td>{{ props.sensor.unit}}</td>
-					<td class="text-right"><b>{{ rokData.celkem }}</b></td>
-					<td class="text-right" v-for="i in 12" :key="i">
+					<td class="text-end"><b>{{ rokData.celkem }}</b></td>
+					<td class="text-end" v-for="i in 12" :key="i">
 						<span v-if="rokData[i] != undefined">{{ rokData[i] }}</span>
 					</td>
 				</tr>
@@ -146,19 +147,19 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 		</table>
 		
 		<table 
-			v-else-if="props.sensor.device_class != 3"
+			v-else-if="props.sensor.id_sensor_classes != 3"
 			class="table table-striped table-bordered table-hover table-sm " >
-			<thead class="thead-light">
+			<thead class="table-light">
 				<tr>
 					<th>Rok</th>
 					<th>Jednotka</th>
-					<th v-for="i in 12" :key="i" class="text-right">{{ String(i).padStart(2, '0') }}</th>
+					<th v-for="i in 12" :key="i" class="text-end">{{ String(i).padStart(2, '0') }}</th>
 				</tr>
 			</thead>
 			<tr v-for="(rokData, rok) in sensorStats.mesicniSumarizace" :key="rok">
 				<td><b>{{ rok }}</b></td>
 				<td>{{ props.sensor.unit}}</td>
-				<td class="text-right" v-for="i in 12" :key="i">
+				<td class="text-end" v-for="i in 12" :key="i">
 					<div v-if="rokData[i] != undefined" class="text-danger py-0 my-0">{{ toMaxDecimalPlaces(rokData[i].max, 2) }}</div>
 					<div v-if="rokData[i] != undefined" class="text-secondary py-0 my-0">{{ toMaxDecimalPlaces(rokData[i].avg, 2) }}</div>
 					<div v-if="rokData[i] != undefined" class="text-primary py-0 my-0">{{ toMaxDecimalPlaces(rokData[i].min, 2) }}</div>
@@ -169,7 +170,7 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 
 	</div>
 
-	<div class="px-2 mb-3" >
+	<div class="px-2 mb-3" v-if="props.sensor != null">
 		<RouterLink :to="'/sensor/' + props.sensor.id" class="btn btn-primary btn-sm" role="button">Späť</RouterLink>
 	</div>
 
@@ -180,7 +181,7 @@ const sensorStatus = computed(() => props.sensor.status || 'inactive')*/
 				<li v-for="de in sensorStats.devices" :key="de.name">
 					<b>{{ de.name }}</b> - {{ de.desc }}
 				</li>
-				<li>Najstaršie dáta v databáze sú z roku {{ sensorStats.years.slice(-1)[0] }}.</li>
+				<li v-if="oldestYear">Najstaršie dáta v databáze sú z roku {{ oldestYear }}.</li>
 			</ul>
 		</small>
 	</div>

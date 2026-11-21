@@ -17,7 +17,7 @@ onUnmounted(() => {
 })
 </script>
 
-<template v-if="store.devices != null">
+<template>
 	<div v-for="item in store.devices" :key="item.id" class="col">
 		<DeviceOneOverview 
 			:device="item" 

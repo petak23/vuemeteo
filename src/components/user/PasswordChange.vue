@@ -41,32 +41,43 @@ const formValid = computed(() =>
 	form.value.newPassword === form.value.confirmPassword
 )
 
+const submitting = ref(false)
+
+const clearForm = () => {
+	form.value.oldPassword = ''
+	form.value.newPassword = ''
+	form.value.confirmPassword = ''
+}
+
 const onSubmit = async () => {
+	if (!formValid.value || submitting.value) return
+	submitting.value = true
+
 	await MainService.postChangePassword(store.user.id, {
 		oldPassword: form.value.oldPassword,
 		newPassword: form.value.newPassword
 	})
 		.then(response => {
 			if (response.data.status == 200) {
-				store.user = response.data.data
-				storeF.showMessage('Údaje boli úspešne zmenené.', 'success', 'OK', 5000)
-				router.push('/user')
+				// API pri zmene hesla nevracia údaje užívateľa, store sa preto nemení
+				clearForm()
+				storeF.showMessage(response.data.message || 'Heslo bolo zmenené.', 'success', 'OK', 5000)
+				router.push('/user/user')
+			} else {
+				storeF.showMessage('Heslo sa nepodarilo zmeniť: ' + (response.data.message || 'neznáma chyba'), 'danger', 'Chyba', 5000)
 			}
 		})
 		.catch((error) => {
-			console.log(error)
-			storeF.showMessage('Chyba pri zmene údajov: ' + error, 'danger', 'Error', 5000)
+			console.error(error)
+			storeF.showMessage('Chyba pri zmene hesla: ' + (error.message || 'neznáma chyba'), 'danger', 'Chyba', 5000)
 		})
-	alert('Heslo úspešne zmenené!')
-	form.value.oldPassword = ''
-	form.value.newPassword = ''
-	form.value.confirmPassword = ''
+		.finally(() => {
+			submitting.value = false
+		})
 }
 
 const onReset = () => {
-	form.value.oldPassword = ''
-	form.value.newPassword = ''
-	form.value.confirmPassword = ''
+	clearForm()
 	router.push('/user/user')
 }
 </script>
@@ -112,7 +123,7 @@ const onReset = () => {
 				</b-form-invalid-feedback>
 			</b-form-group>
 
-			<b-button class="mt-2" type="submit" variant="primary" :disabled="!formValid">Zmeniť heslo</b-button>
+			<b-button class="mt-2" type="submit" variant="primary" :disabled="!formValid || submitting">Zmeniť heslo</b-button>
 			<b-button type="reset" variant="outline-secondary" class="ms-2 mt-2"><i class="fa-solid fa-rotate-left me-1"></i>Späť bez zmeny</b-button>
 		</b-form>
 	</b-card>

@@ -14,7 +14,7 @@ const format_date = (value) => {
 }
 </script>
 
-<template v-if="store.devices != null">
+<template>
 	<div v-for="item in store.devices" :key="item.id" class="device">
 		<div class="row px-2 bg-secondary-subtle device-head" >
 			<div class="col-4 col-md-3">Zariadenie</div>

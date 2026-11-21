@@ -24,25 +24,34 @@ onMounted(() => {
 	if (store.user) {
 		email.value = store.user.email || '';
 		monitoring_token.value = store.user.monitoring_token || '';
+		state_email.value = pattern.test(email.value)
 	}
 });
 
+const submitting = ref(false)
+
 const submitForm = async () => {
-	
-		await MainService.postSaveUser(store.user.id, { email: email.value, monitoring_token: monitoring_token.value })
+	if (!state_email.value || submitting.value) return
+	submitting.value = true
+
+	await MainService.postSaveUser(store.user.id, { email: email.value, monitoring_token: monitoring_token.value })
 		.then(response => {
-			if (response.data.status == 200) {
-				store.user = response.data.data
+			if (response.data.status == 200 && response.data.user != null) {
+				// API vracia rovnakú štruktúru ako načítanie užívateľa (user, token, permission)
+				store.setUserData(response.data)
 				storeF.showMessage('Údaje boli úspešne zmenené.', 'success', 'OK', 5000)
 				router.push('/user/user')
+			} else {
+				storeF.showMessage('Údaje sa nepodarilo zmeniť: ' + (response.data.message || 'neznáma chyba'), 'danger', 'Chyba', 5000)
 			}
 		})
 		.catch((error) => {
-			console.log(error)
-			storeF.showMessage('Chyba pri zmene údajov. ' + error, 'danger', 'Error', 5000)
+			console.error(error)
+			storeF.showMessage('Chyba pri zmene údajov: ' + (error.message || 'neznáma chyba'), 'danger', 'Chyba', 5000)
 		})
-		
-
+		.finally(() => {
+			submitting.value = false
+		})
 }
 const onReset = () => {
 	if (store.user) {
@@ -79,7 +88,7 @@ const onReset = () => {
 				placeholder="Zadajte nový monitoring_token"
 		/>
 		</b-form-group>
-		<b-button type="submit" variant="primary">Uložiť zmeny</b-button>
+		<b-button type="submit" variant="primary" :disabled="!state_email || submitting">Uložiť zmeny</b-button>
 		<b-button type="reset" variant="outline-secondary" class="ms-2"><i class="fa-solid fa-rotate-left me-1"></i>Späť bez zmeny</b-button>
 	</b-form>
 </template>

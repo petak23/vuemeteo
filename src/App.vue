@@ -1,18 +1,42 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import AppFooter from './components/AppFooter.vue'
 import MainMenu from './components/MainMenu/MainMenu.vue'
 import DarkModeButton from './components/DarkModeButton.vue'
-import MySettings from './components/MySettings.vue'
+import { watch, onMounted } from 'vue'
+import MainService from './services/MainService'
 
 import { useMainStore } from './stores/main'
 const store = useMainStore()
+
+const getMySettings = () => {
+	MainService.getMySettings()
+		.then(response => {
+			store.appName = response.data.appName
+			store.links = response.data.links
+			store.dataRetentionDays = response.data.dataRetentionDays
+			store.minYear = response.data.minYear
+		})
+		.catch((error) => {
+			console.error(error)
+		})
+}
+
+// Zariadenia sa načítajú raz po zistení, kto je prihlásený, a potom pri každom
+// prihlásení / odhlásení (zmena id užívateľa). Uloženie profilu (rovnaké id) ich nenačíta znova.
+watch(() => [store.user_loaded, store.user?.id], ([loaded]) => {
+	if (loaded) store.getDevices()
+})
+
+onMounted(() => {
+	getMySettings()
+	store.ensureUser()
+})
 </script>
 
 <template>   
 	<div class="container-fluid">
 		<flash-message />
-		<my-settings />
 		<BNavbar
 			v-b-color-mode="'dark'"
 			toggleable="sm"
@@ -27,21 +51,17 @@ const store = useMainStore()
 			>
 				<!-- Right aligned nav items -->
 				<BNavbarNav class="ms-auto mb-2 mb-lg-0">
-					<BNavItem>
-						<RouterLink v-if="store.user != null" class="nav-link" to="/user/user">
-							<i class="fa-solid fa-user me-1"></i>
-							{{ store.user.prefix }}
-						</RouterLink>
+					<BNavItem v-if="store.user != null" to="/user/user">
+						<i class="fa-solid fa-user me-1"></i>
+						{{ store.user.prefix }}
 					</BNavItem>
-					<BNavItem>
-						<RouterLink class="nav-link" :to="store.user == null ? '/login' : '/logout'">
-							<i class="fa-solid me-1"
-								:class="store.user == null ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket'"
-							></i>
-							{{ store.user == null ? 'Prihlásenie' : 'Odhlásenie' }}
-						</RouterLink>
+					<BNavItem :to="store.user == null ? '/login' : '/logout'">
+						<i class="fa-solid me-1"
+							:class="store.user == null ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket'"
+						></i>
+						{{ store.user == null ? 'Prihlásenie' : 'Odhlásenie' }}
 					</BNavItem>
-				</BNavbarNav>	
+				</BNavbarNav>
 			</BCollapse>
 		</BNavbar>
 		<main class="row"

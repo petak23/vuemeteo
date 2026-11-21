@@ -8,8 +8,9 @@ import { useFlashStore } from './FlashMessages/store/flash'
 const storeF = useFlashStore()
 
 
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
+const route = useRoute()
 
 const props = defineProps({
 	logOut: {
@@ -18,12 +19,11 @@ const props = defineProps({
 	}
 })
 
-//const visible = ref(false)
 const email = ref("")
 const password = ref("")
-const form = ref(false)
 const loading = ref(false)
-const visible_form = ref(true)
+const visible_form = ref(!props.logOut)
+const error_message = ref("")
 
 const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 const state_email = ref(null)
@@ -32,65 +32,64 @@ watch(() => email.value, () => {
 })
 const state_password = ref(null)
 watch(() => password.value, () => {
-	state_password.value = password.value.length > 3
+	state_password.value = password.value.length >= 6 // backend vyžaduje min. 6 znakov
 })
-/*const rules = {
-	required: value => !!value || 'Pole musíte vyplniť!',
-	counter: value => value.length <= 20 || 'Max 20 characters',
-	count_password: value => value.length > 3 || 'Heslo muí mať viac ako 3 znaky.',
-	email: value => {
-		const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-		return pattern.test(value) || 'Chybný e-mail.'
-	}
-}*/
 
-const submit_form = async () =>{
-	if (!email.value && !password.value) return
-	//if (!form.value) return
+// Po prihlásení sa vráť na stránku, ktorá prihlásenie vyžadovala (router guard pridá ?redirect=)
+const redirectTarget = () => {
+	const r = route.query.redirect
+	return typeof r === 'string' && r.startsWith('/') && !r.startsWith('//') ? r : '/'
+}
+
+const submit_form = async () => {
+	if (!email.value || !password.value) return
 	loading.value = true
+	error_message.value = ""
 
 	await MainService.postLogIn({ email: email.value, password: password.value })
-	.then(response => {
-		//console.log(response.data);
-		store.token = response.data.token
-		store.user = response.data.user
-		store.user_permission = response.data.permission
-		visible_form.value = false
-		email.value = ""
-		password.value = ""
-		// Optionally, redirect to another page or update UI
-		loading.value = false
-		storeF.showMessage('Úspešne ste sa prihlásili.', 'success', 'Prihlásenie', 5000)
-		router.push('/') // Presmerovanie...
-	})
-	.catch(error => {
-		console.error('Login failed:', error);
-	});
-
-	setTimeout(() => (loading.value = false), 60000)
+		.then(response => {
+			if (response.data.status == 200 && response.data.user != null) {
+				store.setUserData(response.data)
+				visible_form.value = false
+				email.value = ""
+				password.value = ""
+				storeF.showMessage('Úspešne ste sa prihlásili.', 'success', 'Prihlásenie', 5000)
+				router.push(redirectTarget())
+			} else {
+				error_message.value = response.data.message || 'Prihlásenie sa nepodarilo.'
+			}
+		})
+		.catch(error => {
+			console.error('Login failed:', error)
+			error_message.value = 'Chyba spojenia alebo server neodpovedá.'
+		})
+		.finally(() => {
+			loading.value = false
+		})
 }
 
 onMounted(() => {
 	if (props.logOut) {
-		MainService.getLogOut()
-		.then(response => {
-			//console.log(response.data);
-			store.token = null
-			store.user = null
-			// Optionally, redirect to another page or update UI
-			storeF.showMessage('Boli ste odhlásený.', 'secondary', 'Odhlásenie', 5000)
-		})
-		.catch(error => {
-			console.error('Logout failed:', error);
-		});
+		MainService.postLogOut()
+			.then(() => {
+				store.setUserData(null)
+				storeF.showMessage('Boli ste odhlásený.', 'secondary', 'Odhlásenie', 5000)
+			})
+			.catch(error => {
+				console.error('Logout failed:', error)
+				storeF.showMessage('Odhlásenie sa nepodarilo.', 'danger', 'Odhlásenie', 5000)
+			})
+			.finally(() => {
+				router.push('/')
+			})
 	}
 })
 </script>
 
 <template>
 	<div>
+		<div v-if="props.logOut" class="text-secondary">Odhlasujem…</div>
 		<BForm
-			v-model="form"
 			@submit.prevent="submit_form"
 			v-if="visible_form"
 		>
@@ -121,6 +120,9 @@ onMounted(() => {
 					required
 				/>
 			</BFormFloatingLabel>
+			<div v-if="error_message" class="alert alert-danger py-2" role="alert">
+				{{ error_message }}
+			</div>
 			<BButton
 				type="submit"
 				variant="outline-success"

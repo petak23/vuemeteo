@@ -34,9 +34,8 @@ const viewModalDeleteData = (id) => {
 }
 
 const sendDelete = async () => {
-	if (deleteId == 0) return false
+	if (deleteId.value == 0) return false
 	viewDeleteModal.value = false
-	console.log(deleteId)
 	const data = new FormData()
   data.append('delete', true)
   data.append('update_id', deleteId.value)
@@ -75,7 +74,7 @@ const sendDelete = async () => {
 		</BButton>
 	</h3>
 
-	<div class="col-12" v-if="props.item.updates">
+	<div class="col-12" v-if="props.item.updates && Object.keys(props.item.updates).length">
 		<div class="row text-secondary">
 			<div class="col col-md-1">ID</div>
 			<div class="col-4 col-md-2">Z verzie</div>

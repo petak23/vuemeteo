@@ -14,6 +14,8 @@ function generateToken(length = 40) {
 	return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
 }
 
+// Formulár sa naplní z defaultValues len pri vytvorení komponenty.
+// Rodič (DeviceView) preto komponentu remountuje cez :key pri zmene zariadenia.
 const id_device = ref(props.defaultValues != null ? props.defaultValues.id : 0)
 
 const form = reactive({
@@ -26,12 +28,13 @@ const form = reactive({
 })
 
 const validName = computed(() => {
-	return form.name == null ? null :	/^[0-9A-Za-z]*$/.test(form.name)
+	return form.name == null ? null : /^[0-9A-Za-z]+$/.test(form.name)
 })
 
 const validPassphrase = computed(() => {
 	if (form.passphrase == null) return null
-	else return form.passphrase.length > 4 && form.passphrase.length <= 15})
+	else return form.passphrase.length >= 4 && form.passphrase.length <= 15
+})
 
 const validForm = computed(() => {
 	return validName.value && validPassphrase.value

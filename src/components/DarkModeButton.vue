@@ -1,39 +1,37 @@
 <script setup>
-import { ref, onMounted } from "vue";
+/**
+ * Prepínač svetlého / tmavého režimu (Bootstrap 5.3 `data-bs-theme` na <html>).
+ * Voľba používateľa sa ukladá do localStorage. Kým si používateľ nič nezvolil,
+ * režim sa určí podľa času (tmavý od 18:00 do 6:00).
+ */
+import { ref } from "vue"
 
-// Reaktívna premenná na ukladanie stavu tmavého režimu
-const isDarkMode = ref(false);
+const STORAGE_KEY = 'theme'
 
-// Funkcia na prepínanie tmavého a svetlého režimu
+const getStoredTheme = () => {
+	const t = localStorage.getItem(STORAGE_KEY)
+	return t === 'dark' || t === 'light' ? t : null
+}
+
+const themeByTime = () => {
+	const hour = new Date().getHours()
+	return hour < 6 || hour >= 18 ? 'dark' : 'light'
+}
+
+const applyTheme = (theme) => {
+	document.documentElement.setAttribute('data-bs-theme', theme)
+}
+
+// Nastaví sa hneď pri vytvorení komponenty (pred vykreslením), aby stránka „neblikla“
+const isDarkMode = ref((getStoredTheme() ?? themeByTime()) === 'dark')
+applyTheme(isDarkMode.value ? 'dark' : 'light')
+
 const toggleDarkMode = () => {
-	isDarkMode.value = !isDarkMode.value;
-	updateBodyClass();
-};
-
-// Funkcia na aktualizáciu tried na body elemente
-const updateBodyClass = () => {
-	if (isDarkMode.value) {
-		document.body.classList.add("dark-mode")
-		document.body.setAttribute('data-bs-theme', "dark")
-		document.body.classList.remove("light-mode")
-	} else {
-		document.body.classList.add("light-mode")
-		document.body.setAttribute('data-bs-theme', "light")
-		document.body.classList.remove("dark-mode")
-	}
-};
-
-// Nastavenie režimu podľa aktuálneho času
-const setModeBasedOnTime = () => {
-	const currentTime = new Date().getHours();
-	isDarkMode.value = currentTime < 6 || currentTime >= 18; // Tmavý režim od 18:00 do 6:00
-	updateBodyClass();
-};
-
-// Inicializácia režimu pri načítaní komponenty
-onMounted(() => {
-	setModeBasedOnTime();
-});
+	isDarkMode.value = !isDarkMode.value
+	const theme = isDarkMode.value ? 'dark' : 'light'
+	localStorage.setItem(STORAGE_KEY, theme)
+	applyTheme(theme)
+}
 </script>
 
 <template>
